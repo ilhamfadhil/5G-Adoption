@@ -15,12 +15,15 @@ peoples-own [
   warna
   mno
   friends-met
+  marketers-met
+  mno-red
+  mno-blue
+  mno-yellow
 ]
 
 marketers-own [
-  jenis
-  warna
   adopt?
+  mno
 ]
 
 to setup
@@ -44,9 +47,10 @@ to go
   ]
 
   ask peoples [
-    influence
-    change
+    marketers-influence
     if teman? = true [friend-influence]
+    change-adopt
+    change-mno
   ]
   tick
 
@@ -56,11 +60,18 @@ to create-influencer
 
   create-marketers (jumlah-orang * (1 - proporsi-orang-marketer)) [
     setxy random-xcor random-ycor
-    ifelse random-float 1 > proporsi-marketer [set jenis "influencer"] [set jenis "marketer"]
-    if jenis = "influencer" [set color green]
-    if jenis = "marketer" [set color red]
-    set warna one-of ["red" "yellow" "blue"]
     set adopt? true
+    ifelse random-float 1 >= 0.5 [
+      set mno "red"
+      set color red
+    ][
+      ifelse random-float 1 >= 0.3 [
+        set mno "blue"
+        set color blue
+    ][
+        set mno "yellow"
+        set color yellow
+    ]] ;; ini distribusi marketer
   ]
 
 end
@@ -69,16 +80,19 @@ to create-pasar
 
   create-peoples (jumlah-orang * proporsi-orang-marketer) [
     setxy random-xcor random-ycor
-    set color blue
+    set color grey
     let threshold-num random-normal 80 10
     set threshold min (list threshold-num 100)
     set wealth random-lognormal lognormal-M lognormal-S
     set adoption-score random threshold
     set adopt? false
     set friendlist other n-of 10 peoples
-    set warna "green" ;; warna sesuai dengan mno
-    ifelse random-float 1 >= 0.5 [set mno "red"][ifelse random-float 1 >= 0.3 [set mno "blue"] [set mno "yellow"]] ;; ini distribusi marketer
+    set mno "grey"
     set friends-met 0
+    set marketers-met 0
+    set mno-red 0
+    set mno-yellow 0
+    set mno-blue 0
   ]
 
 end
@@ -91,13 +105,14 @@ to move ;; kalibrasi pergerakan
 
 end
 
-to influence
+to marketers-influence
 
   if any? marketers-here [
     let target one-of marketers-here
-    if [jenis] of target = "marketer" [set adoption-score adoption-score + 10]
-    if [jenis] of target = "influencer" [set adoption-score adoption-score + 20]
-  ]
+    set adoption-score adoption-score + 10
+    set marketers-met marketers-met + 1
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
+    ]
 
 end
 
@@ -114,7 +129,7 @@ to friend-influence
 
 end
 
-to change
+to change-adopt
 
   if adoption-score > threshold [
     set adopt? true
@@ -122,8 +137,19 @@ to change
 
 end
 
+to change-mno
+
+  if adopt? = true [
+    let max-pos max-mno self
+    ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+  ]
+
+end
+
 to-report count-adopt
+
   report count peoples with [adopt? = true]
+
 end
 
 to-report count-friends-mno [agent color-mno]
@@ -139,6 +165,17 @@ to-report random-lognormal [miu sigma]
   let S sqrt beta
   let M ln miu - (beta / 2)
   report exp (random-normal M S)
+
+end
+
+to-report max-mno [agent]
+
+  let red-temp [mno-red] of agent
+  let yellow-temp [mno-yellow] of agent
+  let blue-temp [mno-blue] of agent
+  let mno-list (list mno-red mno-yellow mno-blue)
+  let mno-max max mno-list
+  report position mno-max mno-list
 
 end
 @#$#@#$#@
@@ -221,43 +258,6 @@ false
 PENS
 "default" 3.0 1 -16777216 true "" "histogram [threshold] of peoples"
 
-MONITOR
-483
-113
-553
-158
-Marketer
-count marketers with [jenis = \"marketer\"]
-0
-1
-11
-
-MONITOR
-561
-113
-631
-158
-Influencer
-count marketers with [jenis = \"influencer\"]
-0
-1
-11
-
-SLIDER
-483
-166
-655
-199
-proporsi-marketer
-proporsi-marketer
-0.1
-1
-0.5
-0.1
-1
-NIL
-HORIZONTAL
-
 PLOT
 869
 211
@@ -274,14 +274,16 @@ true
 true
 "" ""
 PENS
-"Adopt" 1.0 0 -14439633 true "" "plot count peoples with [adopt? = true] / count peoples"
-"Not adopt" 1.0 0 -2674135 true "" "plot count peoples with [adopt? = false] / count peoples"
+"Red" 1.0 0 -2674135 true "" "plot count peoples with [adopt? = true and mno = \"red\"] / count peoples"
+"Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] / count peoples"
+"Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] / count peoples"
+"Adopt?" 1.0 0 -16777216 true "" "plot count peoples with [adopt? = true] / count peoples"
 
 SLIDER
-482
-263
-654
-296
+478
+171
+650
+204
 jumlah-orang
 jumlah-orang
 10
@@ -293,10 +295,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-670
-263
-841
-296
+666
+171
+837
+204
 proporsi-orang-marketer
 proporsi-orang-marketer
 0.1
@@ -308,10 +310,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-485
-210
-555
-255
+481
+118
+551
+163
 Orang
 count peoples
 17
@@ -319,10 +321,10 @@ count peoples
 11
 
 MONITOR
-671
-212
-740
-257
+667
+120
+736
+165
 Marketers
 count marketers
 17
@@ -330,10 +332,10 @@ count marketers
 11
 
 SLIDER
-481
-314
-707
-347
+477
+222
+703
+255
 average-mno-sharing
 average-mno-sharing
 0
@@ -345,10 +347,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-480
-352
-708
-385
+476
+260
+704
+293
 average-govt-incentive
 average-govt-incentive
 0
@@ -360,10 +362,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-479
-395
-709
-428
+475
+303
+705
+336
 average-local-govt-cooperation
 average-local-govt-cooperation
 0
@@ -393,10 +395,10 @@ PENS
 "default" 3.0 1 -16777216 true "" "histogram [wealth] of peoples"
 
 SWITCH
-721
-314
-824
-347
+717
+222
+820
+255
 teman?
 teman?
 1
@@ -404,10 +406,10 @@ teman?
 -1000
 
 INPUTBOX
-479
-439
-555
-499
+475
+347
+551
+407
 lognormal-M
 15.0
 1
@@ -415,10 +417,10 @@ lognormal-M
 Number
 
 INPUTBOX
-561
-439
-633
-499
+557
+347
+629
+407
 lognormal-S
 10.0
 1
