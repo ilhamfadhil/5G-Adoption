@@ -1,0 +1,6 @@
+*.tmp
+
+# power point temporary
+~$*.ppt*
+
+# power point
