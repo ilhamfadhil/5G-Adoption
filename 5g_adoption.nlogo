@@ -11,6 +11,7 @@ peoples-own [
   wealth
   adoption-score
   adopt?
+  buy?
   friendlist
   warna
   mno
@@ -87,6 +88,7 @@ to create-pasar
     set wealth random-lognormal lognormal-M lognormal-S
     set adoption-score random threshold
     set adopt? false
+    set buy? false
     set friendlist other n-of 10 peoples
     set mno "grey"
     set friends-met 0
@@ -150,7 +152,7 @@ end
 
 to change-mno
 
-  if adopt? = true[
+  if adopt? = true [
     let max-pos max-mno self
     ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
   ]
@@ -489,7 +491,7 @@ SWITCH
 297
 teman?
 teman?
-0
+1
 1
 -1000
 
