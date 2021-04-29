@@ -46,9 +46,10 @@ to go
     move
   ]
 
-  ask peoples [
+  ask peoples with [adopt? = false][
     marketers-influence
     if teman? = true [friend-influence]
+    if memory? = true [memory-influence]
     change-adopt
     change-mno
   ]
@@ -116,12 +117,13 @@ to marketers-influence
 
 end
 
-to friend-influence
+to memory-influence
 
   if any? peoples-here [
     let target one-of peoples-here
     if member? target friendlist = true [
       set adoption-score adoption-score + 10
+      ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
       set friends-met friends-met + 1
     ]
 
@@ -129,9 +131,18 @@ to friend-influence
 
 end
 
+to friend-influence
+
+  if any? peoples-here with [adopt? = true][
+    let target one-of peoples with [adopt? = true]
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1 ][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
+  ]
+
+end
+
 to change-adopt
 
-  if adoption-score > threshold [
+  if adoption-score > threshold and adopt? = false [
     set adopt? true
   ]
 
@@ -139,7 +150,7 @@ end
 
 to change-mno
 
-  if adopt? = true [
+  if adopt? = true[
     let max-pos max-mno self
     ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
   ]
@@ -397,10 +408,10 @@ PENS
 SWITCH
 717
 222
-820
+822
 255
-teman?
-teman?
+memory?
+memory?
 1
 1
 -1000
@@ -426,6 +437,61 @@ lognormal-S
 1
 0
 Number
+
+MONITOR
+544
+423
+616
+468
+Red-adopt
+count peoples with [adopt? = true and mno = \"red\"]
+0
+1
+11
+
+MONITOR
+478
+422
+535
+467
+Adopt?
+count peoples with [adopt? = true]
+0
+1
+11
+
+MONITOR
+623
+423
+705
+468
+Yellow-adopt?
+count peoples with [adopt? = true  and mno = \"yellow\"]
+0
+1
+11
+
+MONITOR
+715
+423
+788
+468
+Blue-adopt
+count peoples with [adopt? = true and mno = \"blue\"]
+17
+1
+11
+
+SWITCH
+717
+264
+822
+297
+teman?
+teman?
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
