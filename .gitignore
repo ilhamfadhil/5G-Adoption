@@ -3,3 +3,6 @@
 ~$*.ppt*
 *.pptx
 *.tmp.nlogo
+.Rproj.user
+*.Rproj
+*.Rhistory

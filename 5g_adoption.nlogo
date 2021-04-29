@@ -191,6 +191,31 @@ to-report max-mno [agent]
   report position mno-max mno-list
 
 end
+
+to-report count-adopt?
+
+  report count peoples with [adopt? = true]
+
+end
+
+to-report count-red-adopt?
+
+  report count peoples with [adopt? = true and mno = "red"]
+
+end
+
+to-report count-yellow-adopt?
+
+  report count peoples with [adopt? = true and mno = "yellow"]
+
+end
+
+to-report count-blue-adopt?
+
+  report count peoples with [adopt? = true and mno = "blue"]
+
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 18
@@ -841,6 +866,46 @@ NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="interaksi" repetitions="30" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="500"/>
+    <metric>count-adopt?</metric>
+    <metric>count-red-adopt?</metric>
+    <metric>count-blue-adopt?</metric>
+    <metric>count-yellow-adopt?</metric>
+    <enumeratedValueSet variable="jumlah-orang">
+      <value value="700"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proporsi-orang-marketer">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-S">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-M">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-local-govt-cooperation">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="teman?">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-govt-incentive">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory?">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-mno-sharing">
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
