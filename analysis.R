@@ -36,7 +36,7 @@ adopt_df %>%
   geom_density(alpha = 0.5) +
   scale_fill_manual(values = group.colors) +
   scale_color_manual(values = group.colors) +
-  facet_wrap(~memory + teman) +
+  facet_wrap(~ memory + teman) +
   labs(fill = "MNO", 
        color = "MNO",
        x = "Jumlah adopsi", 
@@ -52,4 +52,24 @@ adopt_df %>%
   ggplot(aes(x = n , 
              y = mean_adopt, 
              color = factor(case))) +
-  geom_line()
+  geom_line() +
+  labs(x = "Tick", 
+       y = "Jumlah orang", 
+       color = "Case")
+
+adopt_df %>%
+  select(-adopt) %>%
+  group_by(n, memory, teman) %>%
+  summarise(red = mean(red), 
+            yellow = mean(yellow), 
+            blue = mean(blue)) %>%
+  gather("tipe", "value", -n, -teman, -memory) %>%
+  ggplot(aes(x = n, 
+             y = value, 
+             color = tipe)) +
+  geom_line() +
+  scale_color_manual(values = group.colors) +
+  facet_wrap(~ memory + teman) +
+  labs(x = "Tick", 
+       y = "Jumlah orang", 
+       color = "MNO")
