@@ -1,6 +1,7 @@
 breed [marketers marketer]
 breed [industries industry]
 breed [peoples people]
+breed [sas sa]
 
 globals [
   buying-power
@@ -13,13 +14,21 @@ peoples-own [
   adopt?
   buy?
   friendlist
-  warna
   mno
   friends-met
   marketers-met
+  peoples-met
   mno-red
   mno-blue
   mno-yellow
+]
+
+industries-own [
+  threshold
+  adoption-score
+  adopt?
+  sas-met
+  peoples-met
 ]
 
 marketers-own [
@@ -27,15 +36,23 @@ marketers-own [
   mno
 ]
 
+sas-own [
+  adopt?
+]
+
 to setup
 
   clear-all
   ;;random-seed 42
 
-  set-default-shape peoples "person" ;; mengubah shape menjadi orang
-  set-default-shape marketers "person" ;; mengubah shape menjadi orang
+  set-default-shape peoples "person"
+  set-default-shape marketers "person"
+  set-default-shape industries "factory"
+  set-default-shape sas "person business"
   create-influencer
   create-pasar
+  create-perusahaan
+  create-solution-architect
 
   reset-ticks
 
@@ -49,11 +66,18 @@ to go
 
   ask peoples with [adopt? = false][
     marketers-influence
-    if teman? = true [friend-influence]
+    if teman? = true [peoples-influence]
     if memory? = true [memory-influence]
     change-adopt
     change-mno
   ]
+
+  ask industries with [adopt? = false][
+    sas-influence
+    people-industry-influence
+    change-adopt
+  ]
+
   tick
 
 end
@@ -73,7 +97,17 @@ to create-influencer
     ][
         set mno "yellow"
         set color yellow
-    ]] ;; ini distribusi marketer
+    ]]
+  ]
+
+end
+
+to create-solution-architect
+
+  create-sas 0.2 * count industries [
+    setxy random-xcor random-ycor
+    set color grey
+    set adopt? true
   ]
 
 end
@@ -100,10 +134,23 @@ to create-pasar
 
 end
 
-to move ;; kalibrasi pergerakan
+to create-perusahaan
+
+  create-industries 0.1 * jumlah-orang [
+    setxy random-xcor random-ycor
+    set color grey
+    set threshold random-normal 160 30
+    set adoption-score random 30
+    set adopt? false
+    set peoples-met 0
+    set sas-met 0
+  ]
+
+end
+
+to move
 
   ifelse random-float 1 > 0.5 [rt random-float 180] [lt random-float 180]
-  ;;rt random-float 360
   fd 1
 
 end
@@ -112,10 +159,18 @@ to marketers-influence
 
   if any? marketers-here [
     let target one-of marketers-here
-    set adoption-score adoption-score + 10
+    set adoption-score adoption-score + 10 + (average-mno-sharing / 5 * 3) + (average-govt-incentive / 5 * 3) + (average-local-govt-cooperation / 5 * 4)
     set marketers-met marketers-met + 1
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
-    ]
+  ]
+
+end
+
+to sas-influence
+
+  if any? sas-here [
+    set adoption-score adoption-score + 10
+  ]
 
 end
 
@@ -133,11 +188,20 @@ to memory-influence
 
 end
 
-to friend-influence
+to peoples-influence
 
   if any? peoples-here with [adopt? = true][
     let target one-of peoples with [adopt? = true]
+    set adoption-score adoption-score + 20
     ifelse [mno] of target = "red" [set mno-red mno-red + 1 ][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
+  ]
+
+end
+
+to people-industry-influence
+
+  if any? peoples-here with [adopt? = true][
+    set adoption-score adoption-score + 10
   ]
 
 end
@@ -198,6 +262,24 @@ to-report count-adopt?
 
 end
 
+to-report perc-adopt?
+
+  report count-adopt? / count peoples
+
+end
+
+to-report count-adopt?-industries
+
+  report count industries with [adopt? = true]
+
+end
+
+to-report perc-adopt?-industries
+
+  report count-adopt?-industries / count industries
+
+end
+
 to-report count-red-adopt?
 
   report count peoples with [adopt? = true and mno = "red"]
@@ -215,7 +297,6 @@ to-report count-blue-adopt?
   report count peoples with [adopt? = true and mno = "blue"]
 
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 18
@@ -378,7 +459,7 @@ average-mno-sharing
 average-mno-sharing
 0
 4
-3.0
+0.0
 1
 1
 NIL
@@ -393,7 +474,7 @@ average-govt-incentive
 average-govt-incentive
 0
 5
-3.0
+0.0
 1
 1
 NIL
@@ -408,7 +489,7 @@ average-local-govt-cooperation
 average-local-govt-cooperation
 0
 5
-4.0
+0.0
 1
 1
 NIL
@@ -439,7 +520,7 @@ SWITCH
 255
 memory?
 memory?
-1
+0
 1
 -1000
 
@@ -520,6 +601,46 @@ teman?
 1
 -1000
 
+MONITOR
+565
+119
+625
+164
+Industry
+count industries
+0
+1
+11
+
+MONITOR
+748
+119
+811
+164
+Architect
+count sas
+17
+1
+11
+
+PLOT
+1338
+209
+1753
+359
+Industry Adoption
+Tick
+Percentage
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count industries with [adopt? = true] / count industries"
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -590,6 +711,21 @@ Circle -7500403 true true 110 127 80
 Circle -7500403 true true 110 75 80
 Line -7500403 true 150 100 80 30
 Line -7500403 true 150 100 220 30
+
+building store
+false
+0
+Rectangle -7500403 true true 30 45 45 240
+Rectangle -16777216 false false 30 45 45 165
+Rectangle -7500403 true true 15 165 285 255
+Rectangle -16777216 true false 120 195 180 255
+Line -7500403 true 150 195 150 255
+Rectangle -16777216 true false 30 180 105 240
+Rectangle -16777216 true false 195 180 270 240
+Line -16777216 false 0 165 300 165
+Polygon -7500403 true true 0 165 45 135 60 90 240 90 255 135 300 165
+Rectangle -7500403 true true 0 0 75 45
+Rectangle -16777216 false false 0 0 75 45
 
 butterfly
 true
@@ -665,6 +801,26 @@ Circle -16777216 true false 60 75 60
 Circle -16777216 true false 180 75 60
 Polygon -16777216 true false 150 168 90 184 62 210 47 232 67 244 90 220 109 205 150 198 192 205 210 220 227 242 251 229 236 206 212 183
 
+factory
+false
+0
+Rectangle -7500403 true true 76 194 285 270
+Rectangle -7500403 true true 36 95 59 231
+Rectangle -16777216 true false 90 210 270 240
+Line -7500403 true 90 195 90 255
+Line -7500403 true 120 195 120 255
+Line -7500403 true 150 195 150 240
+Line -7500403 true 180 195 180 255
+Line -7500403 true 210 210 210 240
+Line -7500403 true 240 210 240 240
+Line -7500403 true 90 225 270 225
+Circle -1 true false 37 73 32
+Circle -1 true false 55 38 54
+Circle -1 true false 96 21 42
+Circle -1 true false 105 40 32
+Circle -1 true false 129 19 42
+Rectangle -7500403 true true 14 228 78 270
+
 fish
 false
 0
@@ -736,6 +892,23 @@ Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300
 Rectangle -7500403 true true 127 79 172 94
 Polygon -7500403 true true 195 90 240 150 225 180 165 105
 Polygon -7500403 true true 105 90 60 150 75 180 135 105
+
+person business
+false
+0
+Rectangle -1 true false 120 90 180 180
+Polygon -13345367 true false 135 90 150 105 135 180 150 195 165 180 150 105 165 90
+Polygon -7500403 true true 120 90 105 90 60 195 90 210 116 154 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 183 153 210 210 240 195 195 90 180 90 150 165
+Circle -7500403 true true 110 5 80
+Rectangle -7500403 true true 127 76 172 91
+Line -16777216 false 172 90 161 94
+Line -16777216 false 128 90 139 94
+Polygon -13345367 true false 195 225 195 300 270 270 270 195
+Rectangle -13791810 true false 180 225 195 300
+Polygon -14835848 true false 180 226 195 226 270 196 255 196
+Polygon -13345367 true false 209 202 209 216 244 202 243 188
+Line -16777216 false 180 90 150 165
+Line -16777216 false 120 90 150 165
 
 plant
 false
