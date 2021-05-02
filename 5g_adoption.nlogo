@@ -5,6 +5,7 @@ breed [sas sa]
 
 globals [
   buying-power
+  seed-number
 ]
 
 peoples-own [
@@ -43,7 +44,9 @@ sas-own [
 to setup
 
   clear-all
-  ;;random-seed 42
+
+  set seed-number new-seed
+  random-seed seed-number
 
   set-default-shape peoples "person"
   set-default-shape marketers "person"
@@ -55,6 +58,7 @@ to setup
   create-solution-architect
 
   reset-ticks
+  print seed-number
 
 end
 
