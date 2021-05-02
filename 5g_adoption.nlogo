@@ -524,7 +524,7 @@ SWITCH
 255
 memory?
 memory?
-0
+1
 1
 -1000
 
@@ -1079,21 +1079,21 @@ NetLogo 6.2.0
       <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="average-local-govt-cooperation">
-      <value value="4"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="teman?">
       <value value="true"/>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="average-govt-incentive">
-      <value value="3"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="memory?">
       <value value="true"/>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="average-mno-sharing">
-      <value value="3"/>
+      <value value="0"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

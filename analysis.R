@@ -52,7 +52,7 @@ adopt_df %>%
   ggplot(aes(x = n , 
              y = mean_adopt, 
              color = factor(case))) +
-  geom_line() +
+  geom_line(lwd = 1) +
   labs(x = "Tick", 
        y = "Jumlah orang", 
        color = "Case")
@@ -109,3 +109,23 @@ perc_df %>%
   labs(x = "Ticks", 
        y = "Presentase", 
        color = "Jenis")
+
+perc_df %>%
+  group_by(memory, teman, seed) %>%
+  filter(perc_ind > 0.95) %>%
+  filter(n == min(n)) %>%
+  ggplot(aes(x = n)) +
+  geom_density(fill = "grey") +
+  facet_wrap(~ memory + teman) +
+  labs(x = "Ticks", 
+       y = "Density")
+  
+perc_df %>%
+  group_by(memory, teman, seed) %>%
+  filter(perc_adopt > 0.95) %>%
+  filter(n == min(n)) %>%
+  ggplot(aes(x = n)) +
+  geom_density(fill = "grey") +
+  facet_wrap(~ memory + teman) +
+  labs(x = "Ticks", 
+       y = "Density")
