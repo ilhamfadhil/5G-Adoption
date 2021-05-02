@@ -1,6 +1,6 @@
 library(tidyverse)
 
-data_path <- file.path(".", "data", "5g_adoption interaksi-table.csv")
+data_path <- file.path(".", "data", "5g_adoption interaksi-table-2.csv")
 
 df <- read_csv(data_path, skip = 6)
 
@@ -73,3 +73,39 @@ adopt_df %>%
   labs(x = "Tick", 
        y = "Jumlah orang", 
        color = "MNO")
+
+adopt_df %>%
+  select(n, memory, teman, adopt) %>%
+  group_by(n, memory, teman) %>%
+  summarise(adopt = mean(adopt)) %>%
+  ggplot(aes(x = n ,
+             y = adopt)) +
+  geom_line() +
+  facet_wrap(~ memory + teman) +
+  labs(x = "Tick", 
+       y = "Jumlah orang")
+
+perc_df <- df %>%
+  rename(n = `[step]`, 
+        perc_ind = `perc-adopt?-industries`, 
+        perc_adopt = `perc-adopt?`,
+        memory = `memory?`,
+        teman = `teman?`, 
+        seed = `seed-number`) %>%
+  select(n, perc_ind, perc_adopt, memory, teman, seed)
+
+perc_df %>%
+  select(-seed) %>%
+  group_by(n, memory, teman) %>%
+  summarise(perc_ind = mean(perc_ind), 
+            perc_adopt = mean(perc_adopt)) %>%
+  gather("tipe", "value", -n, -memory, -teman) %>%
+  ggplot(aes(x = n, 
+             y = value,
+             color = tipe)) +
+  geom_line(lwd = 1) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  facet_wrap(~ memory + teman) +
+  labs(x = "Ticks", 
+       y = "Presentase", 
+       color = "Jenis")

@@ -143,7 +143,7 @@ to create-perusahaan
   create-industries 0.1 * jumlah-orang [
     setxy random-xcor random-ycor
     set color grey
-    set threshold random-normal 160 30
+    set threshold random-normal 160 20
     set adoption-score random 30
     set adopt? false
     set peoples-met 0
@@ -364,9 +364,9 @@ NIL
 1
 
 PLOT
-870
+846
 49
-1323
+1131
 199
 Threshold Distribution
 NIL
@@ -382,9 +382,9 @@ PENS
 "default" 3.0 1 -16777216 true "" "histogram [threshold] of peoples"
 
 PLOT
-869
+845
 211
-1323
+1131
 361
 Adoption Count
 Tick
@@ -500,9 +500,9 @@ NIL
 HORIZONTAL
 
 PLOT
-868
+844
 373
-1323
+1132
 523
 Histogram of Wealth
 NIL
@@ -628,9 +628,9 @@ count sas
 11
 
 PLOT
-1338
+1142
 209
-1753
+1397
 359
 Industry Adoption
 Tick
@@ -644,6 +644,17 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count industries with [adopt? = true] / count industries"
+
+MONITOR
+479
+476
+575
+521
+Industry adopt
+count-adopt?-industries
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1048,10 +1059,13 @@ NetLogo 6.2.0
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="500"/>
+    <metric>seed-number</metric>
     <metric>count-adopt?</metric>
     <metric>count-red-adopt?</metric>
     <metric>count-blue-adopt?</metric>
     <metric>count-yellow-adopt?</metric>
+    <metric>perc-adopt?</metric>
+    <metric>perc-adopt?-industries</metric>
     <enumeratedValueSet variable="jumlah-orang">
       <value value="700"/>
     </enumeratedValueSet>
