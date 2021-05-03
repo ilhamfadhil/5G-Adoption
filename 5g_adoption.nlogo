@@ -124,7 +124,7 @@ to create-pasar
     let threshold-num random-normal 80 10
     set threshold min (list threshold-num 100)
     set wealth random-lognormal lognormal-M lognormal-S
-    set adoption-score random threshold
+    set adoption-score random 10
     set adopt? false
     set buy? false
     set friendlist other n-of 10 peoples
@@ -143,7 +143,7 @@ to create-perusahaan
   create-industries 0.1 * jumlah-orang [
     setxy random-xcor random-ycor
     set color grey
-    set threshold random-normal 160 20
+    set threshold random-normal 800 30
     set adoption-score random 30
     set adopt? false
     set peoples-met 0
@@ -173,7 +173,7 @@ end
 to sas-influence
 
   if any? sas-here [
-    set adoption-score adoption-score + 10
+    set adoption-score adoption-score + 100
   ]
 
 end
@@ -601,7 +601,7 @@ SWITCH
 297
 teman?
 teman?
-1
+0
 1
 -1000
 
