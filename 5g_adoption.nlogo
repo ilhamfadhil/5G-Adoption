@@ -121,7 +121,7 @@ to create-pasar
   create-peoples (jumlah-orang * proporsi-orang-marketer) [
     setxy random-xcor random-ycor
     set color grey
-    let threshold-num random-normal 80 10
+    let threshold-num random-lognormal 30 20
     set threshold min (list threshold-num 100)
     set wealth random-lognormal lognormal-M lognormal-S
     set adoption-score random 10
