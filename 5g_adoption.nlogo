@@ -145,7 +145,7 @@ to create-perusahaan
   create-industries 0.1 * jumlah-orang [
     setxy random-xcor random-ycor
     set color grey
-    set threshold random-normal 800 30
+    set threshold random-normal 300 30
     set adoption-score random 30
     set adopt? false
     set peoples-met 0
