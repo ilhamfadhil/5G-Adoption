@@ -10,6 +10,7 @@ globals [
 
 peoples-own [
   threshold
+  adopt-prob
   wealth
   adoption-score
   adopt?
@@ -125,6 +126,7 @@ to create-pasar
     set threshold min (list threshold-num 100)
     set wealth random-lognormal lognormal-M lognormal-S
     set adoption-score random 10
+    set adopt-prob max (list min (list random-normal 60 20 100) 0.000001)
     set adopt? false
     set buy? false
     set friendlist other n-of 10 peoples
@@ -143,7 +145,7 @@ to create-perusahaan
   create-industries 0.1 * jumlah-orang [
     setxy random-xcor random-ycor
     set color grey
-    set threshold random-normal 800 30
+    set threshold random-normal 300 30
     set adoption-score random 30
     set adopt? false
     set peoples-met 0
@@ -214,8 +216,16 @@ end
 
 to change-adopt
 
-  if adoption-score > threshold and adopt? = false [
-    set adopt? true
+  let breed-type [breed] of self
+  if adoption-score > threshold and adopt? = false[
+    ifelse breed-type = peoples [
+      let prob random-float 100
+      if adopt-prob > prob and breed-type = peoples[
+        set adopt? true
+      ]]
+    [
+      set adopt? true
+    ]
   ]
 
 end
