@@ -163,7 +163,8 @@ to marketers-influence
 
   if any? marketers-here [
     let target one-of marketers-here
-    set adoption-score adoption-score + 10 + (average-mno-sharing / 5 * 3) + (average-govt-incentive / 5 * 3) + (average-local-govt-cooperation / 5 * 4)
+    let add-adoption-score random-normal 10 5
+    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing / 5 * 3) + (average-govt-incentive / 5 * 3) + (average-local-govt-cooperation / 5 * 4)
     set marketers-met marketers-met + 1
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
   ]
@@ -182,8 +183,9 @@ to memory-influence
 
   if any? peoples-here [
     let target one-of peoples-here
+    let add-adoption-score random-normal 10 5
     if member? target friendlist = true [
-      set adoption-score adoption-score + 10
+      set adoption-score adoption-score + add-adoption-score
       ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
       set friends-met friends-met + 1
     ]
