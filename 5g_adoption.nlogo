@@ -220,7 +220,7 @@ to change-adopt
   if adoption-score > threshold and adopt? = false[
     ifelse breed-type = peoples [
       let prob random-float 100
-      if adopt-prob > prob and breed-type = peoples[
+      if adopt-prob < prob and breed-type = peoples[
         set adopt? true
       ]]
     [
