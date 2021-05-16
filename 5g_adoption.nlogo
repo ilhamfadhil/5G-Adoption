@@ -20,6 +20,7 @@ peoples-own [
   friends-met
   marketers-met
   peoples-met
+  wait-time
   mno-red
   mno-blue
   mno-yellow
@@ -29,8 +30,10 @@ industries-own [
   threshold
   adoption-score
   adopt?
+  buy?
   sas-met
   peoples-met
+  wait-time
 ]
 
 marketers-own [
@@ -47,6 +50,7 @@ to setup
   clear-all
 
   set seed-number new-seed
+  set buying-power 3
   random-seed seed-number
 
   set-default-shape peoples "person"
@@ -81,6 +85,14 @@ to go
     sas-influence
     people-industry-influence
     change-adopt
+  ]
+
+  ask peoples [
+    buy-tech
+  ]
+
+  ask industries [
+    buy-tech
   ]
 
   tick
@@ -133,6 +145,7 @@ to create-pasar
     set mno "grey"
     set friends-met 0
     set marketers-met 0
+    set wait-time 0
     set mno-red 0
     set mno-yellow 0
     set mno-blue 0
@@ -148,6 +161,7 @@ to create-perusahaan
     set threshold random-normal 300 30
     set adoption-score random 30
     set adopt? false
+    set buy? false
     set peoples-met 0
     set sas-met 0
   ]
@@ -222,9 +236,16 @@ to change-adopt
       let prob random-float 100
       if adopt-prob < prob and breed-type = peoples[
         set adopt? true
-      ]]
+        let x min (list (wealth - buying-power) 0)
+        ifelse 0 <= x and x <= 1[
+          set wait-time 105][
+          set wait-time 209
+        ]
+      ]
+    ]
     [
       set adopt? true
+      set wait-time 110
     ]
   ]
 
@@ -235,6 +256,18 @@ to change-mno
   if adopt? = true [
     let max-pos max-mno self
     ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+  ]
+
+end
+
+to buy-tech
+
+  if adopt? = true and buy? = false [
+    set wait-time wait-time - 1
+
+    if wait-time = 0[
+      set buy? true
+    ]
   ]
 
 end
@@ -315,10 +348,10 @@ to-report count-blue-adopt?
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-18
-58
-460
-501
+5
+32
+447
+475
 -1
 -1
 10.6
@@ -342,10 +375,10 @@ ticks
 30.0
 
 BUTTON
-483
-66
-547
-99
+470
+40
+534
+73
 Setup
 setup
 NIL
@@ -359,10 +392,10 @@ NIL
 1
 
 BUTTON
-562
-65
-625
-98
+549
+39
+612
+72
 go
 Go
 T
@@ -376,10 +409,10 @@ NIL
 1
 
 PLOT
-846
-49
-1131
-199
+833
+23
+1118
+173
 Threshold Distribution
 NIL
 Frequency
@@ -394,11 +427,11 @@ PENS
 "default" 3.0 1 -16777216 true "" "histogram [threshold] of peoples"
 
 PLOT
-845
-211
-1131
-361
-Adoption Count
+835
+337
+1121
+487
+MNO Adoption Count
 Tick
 Percentage
 0.0
@@ -412,13 +445,12 @@ PENS
 "Red" 1.0 0 -2674135 true "" "plot count peoples with [adopt? = true and mno = \"red\"] / count peoples"
 "Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] / count peoples"
 "Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] / count peoples"
-"Adopt?" 1.0 0 -16777216 true "" "plot count peoples with [adopt? = true] / count peoples"
 
 SLIDER
-478
-171
-650
-204
+465
+145
+637
+178
 jumlah-orang
 jumlah-orang
 10
@@ -430,10 +462,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-666
-171
-837
-204
+653
+145
+824
+178
 proporsi-orang-marketer
 proporsi-orang-marketer
 0.1
@@ -445,10 +477,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-481
-118
-551
-163
+468
+92
+538
+137
 Orang
 count peoples
 17
@@ -456,10 +488,10 @@ count peoples
 11
 
 MONITOR
-667
-120
-736
-165
+654
+94
+723
+139
 Marketers
 count marketers
 17
@@ -467,10 +499,10 @@ count marketers
 11
 
 SLIDER
-477
-222
-703
-255
+464
+196
+690
+229
 average-mno-sharing
 average-mno-sharing
 0
@@ -482,10 +514,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-476
-260
-704
-293
+463
+234
+691
+267
 average-govt-incentive
 average-govt-incentive
 0
@@ -497,10 +529,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-475
-303
-705
-336
+462
+277
+692
+310
 average-local-govt-cooperation
 average-local-govt-cooperation
 0
@@ -512,10 +544,10 @@ NIL
 HORIZONTAL
 
 PLOT
-844
-373
-1132
-523
+1128
+22
+1408
+172
 Histogram of Wealth
 NIL
 Frequency
@@ -530,10 +562,10 @@ PENS
 "default" 3.0 1 -16777216 true "" "histogram [wealth] of peoples"
 
 SWITCH
-717
-222
-822
-255
+704
+196
+809
+229
 memory?
 memory?
 0
@@ -541,10 +573,10 @@ memory?
 -1000
 
 INPUTBOX
-475
-347
-551
-407
+462
+321
+538
+381
 lognormal-M
 15.0
 1
@@ -552,10 +584,10 @@ lognormal-M
 Number
 
 INPUTBOX
-557
-347
-629
-407
+544
+321
+616
+381
 lognormal-S
 10.0
 1
@@ -563,10 +595,10 @@ lognormal-S
 Number
 
 MONITOR
-544
-423
-616
-468
+531
+397
+603
+442
 Red-adopt
 count peoples with [adopt? = true and mno = \"red\"]
 0
@@ -574,10 +606,10 @@ count peoples with [adopt? = true and mno = \"red\"]
 11
 
 MONITOR
-478
-422
-535
-467
+465
+396
+522
+441
 Adopt?
 count peoples with [adopt? = true]
 0
@@ -585,10 +617,10 @@ count peoples with [adopt? = true]
 11
 
 MONITOR
-623
-423
-705
-468
+610
+397
+692
+442
 Yellow-adopt?
 count peoples with [adopt? = true  and mno = \"yellow\"]
 0
@@ -596,10 +628,10 @@ count peoples with [adopt? = true  and mno = \"yellow\"]
 11
 
 MONITOR
-715
-423
-788
-468
+702
+397
+775
+442
 Blue-adopt
 count peoples with [adopt? = true and mno = \"blue\"]
 17
@@ -607,10 +639,10 @@ count peoples with [adopt? = true and mno = \"blue\"]
 11
 
 SWITCH
-717
-264
-822
-297
+704
+238
+809
+271
 teman?
 teman?
 1
@@ -618,10 +650,10 @@ teman?
 -1000
 
 MONITOR
-565
-119
-625
-164
+552
+93
+612
+138
 Industry
 count industries
 0
@@ -629,10 +661,10 @@ count industries
 11
 
 MONITOR
-748
-119
-811
-164
+735
+93
+798
+138
 Architect
 count sas
 17
@@ -640,11 +672,11 @@ count sas
 11
 
 PLOT
-1142
-209
-1397
-359
-Industry Adoption
+1128
+180
+1406
+330
+Industry Adoption and Buy
 Tick
 Percentage
 0.0
@@ -652,21 +684,41 @@ Percentage
 0.0
 1.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count industries with [adopt? = true] / count industries"
+"adopt?" 1.0 0 -5298144 true "" "plot count industries with [adopt? = true] / count industries"
+"buy?" 1.0 0 -14070903 true "" "plot count industries with [buy? = true] / count industries"
 
 MONITOR
-479
-476
-575
-521
+466
+450
+562
+495
 Industry adopt
 count-adopt?-industries
 17
 1
 11
+
+PLOT
+834
+179
+1119
+329
+Peoples Adoption and Buy
+Tick
+Percentage
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"adopt?" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true] / count peoples"
+"buy?" 1.0 0 -14070903 true "" "plot count peoples with [buy? = true] / count peoples"
 
 @#$#@#$#@
 ## WHAT IS IT?
