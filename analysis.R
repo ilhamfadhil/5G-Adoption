@@ -1,6 +1,6 @@
 library(tidyverse)
 
-data_path <- file.path(".", "data", "5g_adoption interaksi-table-2.csv")
+data_path <- file.path(".", "data", "5g_adoption adopt buy 1-table.csv")
 
 df <- read_csv(data_path, skip = 6)
 
@@ -10,7 +10,6 @@ table(df$`[run number]`)
 head(df)
 
 adopt_df <- df %>%
-  filter(`teman?` == TRUE && `memory?` == TRUE) %>%
   select(`[step]`, `count-adopt?`, `count-red-adopt?`, 
          `count-blue-adopt?`, `count-yellow-adopt?`,
          `memory?`, `teman?`) %>%
