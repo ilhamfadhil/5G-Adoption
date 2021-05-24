@@ -180,7 +180,7 @@ to marketers-influence
   if any? marketers-here [
     let target one-of marketers-here
     let add-adoption-score random-normal 10 5
-    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing / 5 * 3) + (average-govt-incentive / 5 * 3) + (average-local-govt-cooperation / 5 * 4)
+    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3))
     set marketers-met marketers-met + 1
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
   ]
@@ -223,7 +223,7 @@ end
 to people-industry-influence
 
   if any? peoples-here with [adopt? = true][
-    set adoption-score adoption-score + 10
+    set adoption-score adoption-score + 1
   ]
 
 end
@@ -245,7 +245,7 @@ to change-adopt
     ]
     [
       set adopt? true
-      set wait-time 110
+      set wait-time 25
     ]
   ]
 
@@ -507,7 +507,7 @@ average-mno-sharing
 average-mno-sharing
 0
 4
-4.0
+3.0
 1
 1
 NIL
@@ -521,8 +521,8 @@ SLIDER
 average-govt-incentive
 average-govt-incentive
 0
-5
-5.0
+2
+2.0
 1
 1
 NIL
@@ -536,8 +536,8 @@ SLIDER
 average-local-govt-cooperation
 average-local-govt-cooperation
 0
-5
-4.0
+3
+3.0
 1
 1
 NIL
@@ -1200,6 +1200,51 @@ NetLogo 6.2.0
     <enumeratedValueSet variable="average-mno-sharing">
       <value value="1"/>
       <value value="4"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="adopt buy 1" repetitions="30" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="500"/>
+    <metric>seed-number</metric>
+    <metric>count-adopt?</metric>
+    <metric>count-red-adopt?</metric>
+    <metric>count-blue-adopt?</metric>
+    <metric>count-yellow-adopt?</metric>
+    <metric>perc-adopt?</metric>
+    <metric>perc-adopt?-industries</metric>
+    <enumeratedValueSet variable="jumlah-orang">
+      <value value="700"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proporsi-orang-marketer">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-S">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-M">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-local-govt-cooperation">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-govt-incentive">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="teman?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-mno-sharing">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="3"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

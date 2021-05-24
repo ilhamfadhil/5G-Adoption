@@ -81,3 +81,22 @@ clean_survei %>%
   ggplot(aes(x = anggaran, 
              y = n)) +
   geom_col() 
+
+clean_survei %>%
+  ggplot(aes(x = teknologi, y = marketing)) +
+  geom_jitter(size = 3, alpha = 0.3)
+
+clean_survei %>%
+  ggplot(aes(x = teknologi, y = marketing)) +
+  geom_point(size = 3, alpha = 0.3)
+
+clean_survei %>%
+  count(teknologi, marketing) %>%
+  ggplot(aes(x = teknologi, y = marketing, size = n)) +
+  geom_point()
+
+cor(clean_survei$teknologi, clean_survei$marketing)
+
+model <- lm(teknologi ~ marketing, data = clean_survei)
+
+summary(model)
