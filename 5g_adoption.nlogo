@@ -180,7 +180,7 @@ to marketers-influence
   if any? marketers-here [
     let target one-of marketers-here
     let add-adoption-score random-normal 10 5
-    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3))
+    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3)) + (infra-co-innovation * (0.43862))
     set marketers-met marketers-met + 1
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
   ]
@@ -529,7 +529,7 @@ NIL
 HORIZONTAL
 
 SLIDER
-462
+464
 277
 692
 310
@@ -573,10 +573,10 @@ memory?
 -1000
 
 INPUTBOX
-462
-321
-538
-381
+705
+277
+781
+337
 lognormal-M
 15.0
 1
@@ -584,10 +584,10 @@ lognormal-M
 Number
 
 INPUTBOX
-544
-321
-616
-381
+705
+343
+781
+403
 lognormal-S
 10.0
 1
@@ -596,9 +596,9 @@ Number
 
 MONITOR
 531
-397
+412
 603
-442
+457
 Red-adopt
 count peoples with [adopt? = true and mno = \"red\"]
 0
@@ -607,9 +607,9 @@ count peoples with [adopt? = true and mno = \"red\"]
 
 MONITOR
 465
-396
+411
 522
-441
+456
 Adopt?
 count peoples with [adopt? = true]
 0
@@ -618,9 +618,9 @@ count peoples with [adopt? = true]
 
 MONITOR
 610
-397
+412
 692
-442
+457
 Yellow-adopt?
 count peoples with [adopt? = true  and mno = \"yellow\"]
 0
@@ -629,9 +629,9 @@ count peoples with [adopt? = true  and mno = \"yellow\"]
 
 MONITOR
 702
-397
+412
 775
-442
+457
 Blue-adopt
 count peoples with [adopt? = true and mno = \"blue\"]
 17
@@ -692,9 +692,9 @@ PENS
 
 MONITOR
 466
-450
+465
 562
-495
+510
 Industry adopt
 count-adopt?-industries
 17
@@ -719,6 +719,21 @@ true
 PENS
 "adopt?" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true] / count peoples"
 "buy?" 1.0 0 -14070903 true "" "plot count peoples with [buy? = true] / count peoples"
+
+SLIDER
+464
+320
+694
+353
+infra-co-innovation
+infra-co-innovation
+0
+2
+0.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
