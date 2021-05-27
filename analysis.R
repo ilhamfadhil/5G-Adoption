@@ -12,14 +12,18 @@ head(df)
 adopt_df <- df %>%
   select(`[step]`, `count-adopt?`, `count-red-adopt?`, 
          `count-blue-adopt?`, `count-yellow-adopt?`,
-         `memory?`, `teman?`) %>%
+         `memory?`, `teman?`, `average-mno-sharing`, 
+         `average-govt-incentive`, `average-local-govt-cooperation`) %>%
   rename(n = `[step]`, 
          adopt = `count-adopt?`, 
          red = `count-red-adopt?`, 
          blue = `count-blue-adopt?`, 
          yellow = `count-yellow-adopt?`, 
          memory = `memory?`, 
-         teman = `teman?`)
+         teman = `teman?`, 
+         mno_sharing = `average-mno-sharing`, 
+         govt_incentive = `average-govt-incentive`, 
+         govt_local_coop = `average-local-govt-cooperation`)
 
 group.colors <- c("red" = "firebrick3", 
                   "yellow" = "goldenrod3", 
@@ -128,3 +132,59 @@ perc_df %>%
   facet_wrap(~ memory + teman) +
   labs(x = "Ticks", 
        y = "Density")
+
+##### Analisis Skenario parameter
+
+adopt_scen_df <- df %>%
+  select(`[step]`, `count-adopt?`, `count-red-adopt?`, 
+         `count-blue-adopt?`, `count-yellow-adopt?`, `average-mno-sharing`, 
+         `average-govt-incentive`, `average-local-govt-cooperation`, 
+         `[run number]`, `perc-adopt?-industries`, `perc-adopt?`, 
+         `seed-number`) %>%
+  rename(n = `[step]`, 
+         adopt = `count-adopt?`, 
+         red = `count-red-adopt?`, 
+         blue = `count-blue-adopt?`, 
+         yellow = `count-yellow-adopt?`, 
+         mno_sharing = `average-mno-sharing`, 
+         govt_incentive = `average-govt-incentive`, 
+         govt_local_coop = `average-local-govt-cooperation`, 
+         run_number = `[run number]`, 
+         perc_ind = `perc-adopt?-industries`, 
+         perc_adopt = `perc-adopt?`,
+         seed = `seed-number`)
+
+dim(adopt_scen_df)
+colSums(is.na(adopt_scen_df))
+
+adopt_scen_df %>%
+  group_by(n, mno_sharing, govt_incentive, govt_local_coop) %>%
+  summarise(mean_adopt = mean(adopt)) %>%
+  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop)) %>%
+  ggplot(aes(x = n, y = mean_adopt, group = group, color = group)) +
+  geom_line()
+
+adopt_scen_df %>%
+  group_by(seed) %>%
+  filter(perc_adopt > 0.95) %>%
+  filter(n == min(n)) %>%
+  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop)) %>%
+  ggplot(aes(x = n, fill = group)) +
+  geom_density(alpha = 0.3) +
+  labs(x = "Ticks", 
+       y = "Density")
+
+adopt_scen_df %>%
+  group_by(seed) %>%
+  filter(perc_adopt > 0.9) %>%
+  filter(n == min(n)) %>%
+  ungroup() %>%
+  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop)) %>%
+  group_by(group) %>%
+  mutate(mean_perc = mean(n)) %>%
+  ggplot(aes(x = group, y = n)) +
+  geom_boxplot() +
+  geom_point(aes(y = mean_perc), 
+             color = 'red') +
+  labs(x = "Skenario", 
+       y = "Final Tick")
