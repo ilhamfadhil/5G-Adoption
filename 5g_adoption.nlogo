@@ -84,6 +84,7 @@ to go
   ask industries with [adopt? = false][
     sas-influence
     people-industry-influence
+    industry-industry-influence
     change-adopt
   ]
 
@@ -179,7 +180,7 @@ to marketers-influence
 
   if any? marketers-here [
     let target one-of marketers-here
-    let add-adoption-score random-normal 10 5
+    let add-adoption-score random-normal 7.69 1.8
     set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3)) + (infra-co-innovation * (0.43862))
     set marketers-met marketers-met + 1
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
@@ -190,7 +191,8 @@ end
 to sas-influence
 
   if any? sas-here [
-    set adoption-score adoption-score + 100
+    let random-adoption-score random-normal 23.085 5.38
+    set adoption-score adoption-score + random-adoption-score
   ]
 
 end
@@ -214,7 +216,8 @@ to peoples-influence
 
   if any? peoples-here with [adopt? = true][
     let target one-of peoples with [adopt? = true]
-    set adoption-score adoption-score + 20
+    let random-adoption-score random-normal 7.79 1.7
+    set adoption-score adoption-score + random-adoption-score
     ifelse [mno] of target = "red" [set mno-red mno-red + 1 ][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
@@ -223,7 +226,16 @@ end
 to people-industry-influence
 
   if any? peoples-here with [adopt? = true][
-    set adoption-score adoption-score + 1
+    set adoption-score adoption-score + 0.57
+  ]
+
+end
+
+to industry-industry-influence
+
+  if any? industries-here with [adopt? = true][
+    let random-adoption-score random-normal 23.37 5.1
+    set adoption-score adoption-score + random-adoption-score
   ]
 
 end
@@ -578,7 +590,7 @@ INPUTBOX
 781
 337
 lognormal-M
-15.0
+5.0
 1
 0
 Number
@@ -589,7 +601,7 @@ INPUTBOX
 781
 403
 lognormal-S
-10.0
+6.0
 1
 0
 Number
@@ -729,11 +741,62 @@ infra-co-innovation
 infra-co-innovation
 0
 2
-0.0
+2.0
 1
 1
 NIL
 HORIZONTAL
+
+INPUTBOX
+467
+519
+580
+579
+ARPU-mno-red
+60300.0
+1
+0
+Number
+
+INPUTBOX
+586
+519
+691
+579
+ARPU-mno-yellow
+48240.0
+1
+0
+Number
+
+INPUTBOX
+696
+519
+800
+579
+ARPU-mno-blue
+43550.0
+1
+0
+Number
+
+PLOT
+1130
+338
+1405
+488
+MNOs Revenue
+Tick
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
 
 @#$#@#$#@
 ## WHAT IS IT?
