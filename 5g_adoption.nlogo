@@ -109,7 +109,7 @@ to create-influencer
       set mno "red"
       set color red
     ][
-      ifelse random-float 1 >= 0.3 [
+      ifelse random-float 1 >= 0.4 [
         set mno "blue"
         set color blue
     ][
@@ -249,12 +249,8 @@ to change-adopt
       if adopt-prob < prob and breed-type = peoples[
         set adopt? true
         let x min (list (wealth - buying-power) 0)
-        ifelse 0 <= x and x <= 1[
-          set wait-time 105][
-          set wait-time 209
-        ]
-      ]
-    ]
+        ifelse x <= -2[set wait-time 312][ifelse x <= -1 [set wait-time 208][ifelse x < 0 [set wait-time 104][set wait-time 1]]]
+    ]]
     [
       set adopt? true
       set wait-time 25
@@ -519,7 +515,7 @@ average-mno-sharing
 average-mno-sharing
 0
 4
-3.0
+0.0
 1
 1
 NIL
@@ -534,7 +530,7 @@ average-govt-incentive
 average-govt-incentive
 0
 2
-2.0
+0.0
 1
 1
 NIL
@@ -549,7 +545,7 @@ average-local-govt-cooperation
 average-local-govt-cooperation
 0
 3
-3.0
+0.0
 1
 1
 NIL
@@ -741,7 +737,7 @@ infra-co-innovation
 infra-co-innovation
 0
 2
-2.0
+0.0
 1
 1
 NIL
@@ -781,10 +777,10 @@ ARPU-mno-blue
 Number
 
 PLOT
-1130
-338
-1405
-488
+1127
+337
+1406
+487
 MNOs Revenue
 Tick
 NIL
@@ -793,10 +789,12 @@ NIL
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
+"Red" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true and mno = \"red\"] * (ARPU-mno-red / 4)"
+"Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] * (ARPU-mno-yellow / 4)"
+"Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] * (ARPU-mno-blue / 4)"
 
 @#$#@#$#@
 ## WHAT IS IT?
