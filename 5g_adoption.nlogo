@@ -84,6 +84,7 @@ to go
   ask industries with [adopt? = false][
     sas-influence
     people-industry-influence
+    industry-industry-influence
     change-adopt
   ]
 
@@ -108,7 +109,7 @@ to create-influencer
       set mno "red"
       set color red
     ][
-      ifelse random-float 1 >= 0.3 [
+      ifelse random-float 1 >= 0.4 [
         set mno "blue"
         set color blue
     ][
@@ -179,7 +180,7 @@ to marketers-influence
 
   if any? marketers-here [
     let target one-of marketers-here
-    let add-adoption-score random-normal 10 5
+    let add-adoption-score random-normal 7.69 1.8
     set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3)) + (infra-co-innovation * (0.43862))
     set marketers-met marketers-met + 1
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
@@ -190,7 +191,8 @@ end
 to sas-influence
 
   if any? sas-here [
-    set adoption-score adoption-score + 100
+    let random-adoption-score random-normal 23.085 5.38
+    set adoption-score adoption-score + random-adoption-score
   ]
 
 end
@@ -214,7 +216,8 @@ to peoples-influence
 
   if any? peoples-here with [adopt? = true][
     let target one-of peoples with [adopt? = true]
-    set adoption-score adoption-score + 20
+    let random-adoption-score random-normal 7.79 1.7
+    set adoption-score adoption-score + random-adoption-score
     ifelse [mno] of target = "red" [set mno-red mno-red + 1 ][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
@@ -223,7 +226,16 @@ end
 to people-industry-influence
 
   if any? peoples-here with [adopt? = true][
-    set adoption-score adoption-score + 1
+    set adoption-score adoption-score + 0.57
+  ]
+
+end
+
+to industry-industry-influence
+
+  if any? industries-here with [adopt? = true][
+    let random-adoption-score random-normal 23.37 5.1
+    set adoption-score adoption-score + random-adoption-score
   ]
 
 end
@@ -237,12 +249,8 @@ to change-adopt
       if adopt-prob < prob and breed-type = peoples[
         set adopt? true
         let x min (list (wealth - buying-power) 0)
-        ifelse 0 <= x and x <= 1[
-          set wait-time 105][
-          set wait-time 209
-        ]
-      ]
-    ]
+        ifelse x <= -2[set wait-time 312][ifelse x <= -1 [set wait-time 208][ifelse x < 0 [set wait-time 104][set wait-time 1]]]
+    ]]
     [
       set adopt? true
       set wait-time 25
@@ -507,7 +515,7 @@ average-mno-sharing
 average-mno-sharing
 0
 4
-3.0
+0.0
 1
 1
 NIL
@@ -522,7 +530,7 @@ average-govt-incentive
 average-govt-incentive
 0
 2
-2.0
+0.0
 1
 1
 NIL
@@ -537,7 +545,7 @@ average-local-govt-cooperation
 average-local-govt-cooperation
 0
 3
-3.0
+0.0
 1
 1
 NIL
@@ -578,7 +586,7 @@ INPUTBOX
 781
 337
 lognormal-M
-15.0
+5.0
 1
 0
 Number
@@ -589,7 +597,7 @@ INPUTBOX
 781
 403
 lognormal-S
-10.0
+6.0
 1
 0
 Number
@@ -734,6 +742,59 @@ infra-co-innovation
 1
 NIL
 HORIZONTAL
+
+INPUTBOX
+467
+519
+580
+579
+ARPU-mno-red
+60300.0
+1
+0
+Number
+
+INPUTBOX
+586
+519
+691
+579
+ARPU-mno-yellow
+48240.0
+1
+0
+Number
+
+INPUTBOX
+696
+519
+800
+579
+ARPU-mno-blue
+43550.0
+1
+0
+Number
+
+PLOT
+1127
+337
+1406
+487
+MNOs Revenue
+Tick
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Red" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true and mno = \"red\"] * (ARPU-mno-red / 4)"
+"Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] * (ARPU-mno-yellow / 4)"
+"Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] * (ARPU-mno-blue / 4)"
 
 @#$#@#$#@
 ## WHAT IS IT?

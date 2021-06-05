@@ -100,3 +100,6 @@ cor(clean_survei$teknologi, clean_survei$marketing)
 model <- lm(teknologi ~ marketing, data = clean_survei)
 
 summary(model)
+
+model <- lm(usaha ~ teman, data = survei)
+summary(model)
