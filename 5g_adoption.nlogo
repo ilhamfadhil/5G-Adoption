@@ -337,6 +337,12 @@ to-report perc-adopt?-industries
 
 end
 
+to-report count-mno-adopt? [mno-color]
+
+  report count peoples with [adopt? = true and mno = mno-color]
+
+end
+
 to-report count-red-adopt?
 
   report count peoples with [adopt? = true and mno = "red"]
@@ -352,6 +358,12 @@ end
 to-report count-blue-adopt?
 
   report count peoples with [adopt? = true and mno = "blue"]
+
+end
+
+to-report count-mno-buy? [mno-color]
+
+  report count peoples with [buy? = true and mno = mno-color]
 
 end
 @#$#@#$#@
@@ -439,7 +451,7 @@ PLOT
 337
 1121
 487
-MNO Adoption Count
+MNO Adoption Market Share Percentage
 Tick
 Percentage
 0.0
@@ -450,9 +462,9 @@ true
 true
 "" ""
 PENS
-"Red" 1.0 0 -2674135 true "" "plot count peoples with [adopt? = true and mno = \"red\"] / count peoples"
-"Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] / count peoples"
-"Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] / count peoples"
+"Red" 1.0 0 -2674135 true "" "carefully [plot count-mno-adopt? \"red\" / count-adopt?] [plot 0]"
+"Yellow" 1.0 0 -4079321 true "" "carefully [plot count-mno-adopt? \"yellow\" / count-adopt?] [plot 0]"
+"Blue" 1.0 0 -14070903 true "" "carefully [plot count-mno-adopt? \"blue\" / count-adopt?] [plot 0]"
 
 SLIDER
 465
@@ -684,7 +696,7 @@ PLOT
 180
 1406
 330
-Industry Adoption and Buy
+Industry Adoption and Buy Percentage
 Tick
 Percentage
 0.0
@@ -714,7 +726,7 @@ PLOT
 179
 1119
 329
-Peoples Adoption and Buy
+Peoples Adoption and Buy Percentage
 Tick
 Percentage
 0.0
@@ -792,9 +804,9 @@ true
 true
 "" ""
 PENS
-"Red" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true and mno = \"red\"] * (ARPU-mno-red / 4)"
-"Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] * (ARPU-mno-yellow / 4)"
-"Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] * (ARPU-mno-blue / 4)"
+"Red" 1.0 0 -5298144 true "" "plot count-mno-buy? \"red\" * (ARPU-mno-red / 4)"
+"Yellow" 1.0 0 -4079321 true "" "plot count-mno-buy? \"yellow\" * (ARPU-mno-yellow / 4)"
+"Blue" 1.0 0 -14070903 true "" "plot count-mno-buy? \"blue\" * (ARPU-mno-blue / 4)"
 
 @#$#@#$#@
 ## WHAT IS IT?
