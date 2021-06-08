@@ -191,8 +191,9 @@ end
 to sas-influence
 
   if any? sas-here [
+    let target one-of sas-here
     let random-adoption-score random-normal 23.085 5.38
-    set adoption-score adoption-score + random-adoption-score
+    set adoption-score adoption-score + random-adoption-score + (average-mno-sharing * 0.43862 * 3) + (average-govt-incentive * (0.43862 / 2) * 3) + (average-local-govt-cooperation * (0.43862 / 3 ) * 3) + (infra-co-innovation * (0.43862) * 3)
   ]
 
 end
@@ -328,6 +329,18 @@ end
 to-report count-adopt?-industries
 
   report count industries with [adopt? = true]
+
+end
+
+to-report count-buy?-people
+
+  report count peoples with [buy? = true]
+
+end
+
+to-report count-buy?-industries
+
+  report count industries with [buy? = true]
 
 end
 
@@ -1333,6 +1346,64 @@ NetLogo 6.2.0
       <value value="0"/>
       <value value="1"/>
       <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="experiment-final" repetitions="30" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1100"/>
+    <metric>seed-number</metric>
+    <metric>count-adopt?</metric>
+    <metric>count-red-adopt?</metric>
+    <metric>count-blue-adopt?</metric>
+    <metric>count-yellow-adopt?</metric>
+    <metric>perc-adopt?</metric>
+    <metric>perc-adopt?-industries</metric>
+    <enumeratedValueSet variable="jumlah-orang">
+      <value value="700"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ARPU-mno-red">
+      <value value="60300"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proporsi-orang-marketer">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="infra-co-innovation">
+      <value value="0"/>
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ARPU-mno-blue">
+      <value value="43550"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-S">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-M">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="teman?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-local-govt-cooperation">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-govt-incentive">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ARPU-mno-yellow">
+      <value value="48240"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-mno-sharing">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="4"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

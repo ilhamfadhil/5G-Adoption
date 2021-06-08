@@ -1,6 +1,7 @@
 library(tidyverse)
+library(forcats)
 
-data_path <- file.path(".", "data", "5g_adoption adopt buy 1-table.csv")
+data_path <- file.path(".", "data", "5g_adoption experiment-final-table.csv")
 
 df <- read_csv(data_path, skip = 6)
 
@@ -13,7 +14,8 @@ adopt_df <- df %>%
   select(`[step]`, `count-adopt?`, `count-red-adopt?`, 
          `count-blue-adopt?`, `count-yellow-adopt?`,
          `memory?`, `teman?`, `average-mno-sharing`, 
-         `average-govt-incentive`, `average-local-govt-cooperation`) %>%
+         `average-govt-incentive`, `average-local-govt-cooperation`, 
+         `infra-co-innovation`) %>%
   rename(n = `[step]`, 
          adopt = `count-adopt?`, 
          red = `count-red-adopt?`, 
@@ -23,7 +25,8 @@ adopt_df <- df %>%
          teman = `teman?`, 
          mno_sharing = `average-mno-sharing`, 
          govt_incentive = `average-govt-incentive`, 
-         govt_local_coop = `average-local-govt-cooperation`)
+         govt_local_coop = `average-local-govt-cooperation`,
+         infra_co_innov = `infra-co-innovation`)
 
 group.colors <- c("red" = "firebrick3", 
                   "yellow" = "goldenrod3", 
@@ -140,7 +143,8 @@ adopt_scen_df <- df %>%
          `count-blue-adopt?`, `count-yellow-adopt?`, `average-mno-sharing`, 
          `average-govt-incentive`, `average-local-govt-cooperation`, 
          `[run number]`, `perc-adopt?-industries`, `perc-adopt?`, 
-         `seed-number`) %>%
+         `seed-number`, 
+         `infra-co-innovation`) %>%
   rename(n = `[step]`, 
          adopt = `count-adopt?`, 
          red = `count-red-adopt?`, 
@@ -152,15 +156,16 @@ adopt_scen_df <- df %>%
          run_number = `[run number]`, 
          perc_ind = `perc-adopt?-industries`, 
          perc_adopt = `perc-adopt?`,
-         seed = `seed-number`)
+         seed = `seed-number`, 
+         infra_co_innov = `infra-co-innovation`)
 
 dim(adopt_scen_df)
 colSums(is.na(adopt_scen_df))
 
 adopt_scen_df %>%
-  group_by(n, mno_sharing, govt_incentive, govt_local_coop) %>%
+  group_by(n, mno_sharing, govt_incentive, govt_local_coop, infra_co_innov) %>%
   summarise(mean_adopt = mean(adopt)) %>%
-  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop)) %>%
+  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop, infra_co_innov)) %>%
   ggplot(aes(x = n, y = mean_adopt, group = group, color = group)) +
   geom_line()
 
@@ -168,7 +173,7 @@ adopt_scen_df %>%
   group_by(seed) %>%
   filter(perc_adopt > 0.95) %>%
   filter(n == min(n)) %>%
-  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop)) %>%
+  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop, infra_co_innov)) %>%
   ggplot(aes(x = n, fill = group)) +
   geom_density(alpha = 0.3) +
   labs(x = "Ticks", 
@@ -179,12 +184,31 @@ adopt_scen_df %>%
   filter(perc_adopt > 0.9) %>%
   filter(n == min(n)) %>%
   ungroup() %>%
-  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop)) %>%
+  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop, infra_co_innov)) %>%
   group_by(group) %>%
   mutate(mean_perc = mean(n)) %>%
-  ggplot(aes(x = group, y = n)) +
+  ggplot(aes(x = fct_rev(group), y = n)) +
   geom_boxplot() +
   geom_point(aes(y = mean_perc), 
              color = 'red') +
   labs(x = "Skenario", 
-       y = "Final Tick")
+       y = "Final Tick", 
+       caption = "Parameter: mno sharing/govt incentive/govt local coop/infra") +
+  coord_flip() 
+
+adopt_scen_df %>%
+  group_by(seed) %>%
+  filter(perc_ind > 0.9) %>%
+  filter(n == min(n)) %>%
+  ungroup() %>%
+  mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop, infra_co_innov)) %>%
+  group_by(group) %>%
+  mutate(mean_perc = mean(n)) %>%
+  ggplot(aes(x = fct_rev(group), y = n)) +
+  geom_boxplot() +
+  geom_point(aes(y = mean_perc), 
+             color = 'red') +
+  labs(x = "Skenario", 
+       y = "Final Tick", 
+       caption = "Parameter: mno sharing/govt incentive/govt local coop/infra") +
+  coord_flip() 
