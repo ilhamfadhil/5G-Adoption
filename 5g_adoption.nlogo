@@ -92,6 +92,7 @@ to go
     people-industry-influence
     industry-industry-influence
     change-adopt
+    ;; add change-mno to industry
   ]
 
   ask peoples [
@@ -115,7 +116,7 @@ to create-influencer
       set mno "red"
       set color red
     ][
-      ifelse random-float 1 >= 0.4 [
+      ifelse random-float 1 >= 0.5 [
         set mno "blue"
         set color blue
     ][
@@ -223,9 +224,9 @@ end
 
 to memory-influence
 
-  if any? peoples-here [
+  if any? peoples-here with [adopt? = true][
     let target one-of peoples-here
-    let add-adoption-score random-normal 10 5
+    let add-adoption-score random-normal 7.79 1.7
     if member? target friendlist = true [
       set adoption-score adoption-score + add-adoption-score
       ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
@@ -764,8 +765,8 @@ true
 true
 "" ""
 PENS
-"adopt?" 1.0 0 -5298144 true "" "plot count industries with [adopt? = true] / count industries"
-"buy?" 1.0 0 -14070903 true "" "plot count industries with [buy? = true] / count industries"
+"adopt?" 1.0 0 -15040220 true "" "plot count industries with [adopt? = true] / count industries"
+"buy?" 1.0 0 -12895429 true "" "plot count industries with [buy? = true] / count industries"
 
 MONITOR
 466
@@ -794,8 +795,8 @@ true
 true
 "" ""
 PENS
-"adopt?" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true] / count peoples"
-"buy?" 1.0 0 -14070903 true "" "plot count peoples with [buy? = true] / count peoples"
+"adopt?" 1.0 0 -14439633 true "" "plot count peoples with [adopt? = true] / count peoples"
+"buy?" 1.0 0 -12895429 true "" "plot count peoples with [buy? = true] / count peoples"
 
 SLIDER
 464
