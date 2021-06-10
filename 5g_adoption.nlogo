@@ -34,6 +34,11 @@ industries-own [
   sas-met
   peoples-met
   wait-time
+  mno
+  mno-red
+  mno-blue
+  mno-yellow
+  industries-list
 ]
 
 marketers-own [
@@ -43,6 +48,7 @@ marketers-own [
 
 sas-own [
   adopt?
+  mno
 ]
 
 to setup
@@ -126,6 +132,18 @@ to create-solution-architect
     setxy random-xcor random-ycor
     set color grey
     set adopt? true
+
+    ifelse random-float 1 >= 0.5 [
+      set mno "red"
+      set color red
+    ][
+      ifelse random-float 1 >= 0.4 [
+        set mno "blue"
+        set color blue
+    ][
+        set mno "yellow"
+        set color yellow
+    ]]
   ]
 
 end
@@ -165,6 +183,10 @@ to create-perusahaan
     set buy? false
     set peoples-met 0
     set sas-met 0
+    set mno-red 0
+    set mno-blue 0
+    set mno-yellow 0
+    set industries-list other n-of 3 industries
   ]
 
 end
@@ -183,7 +205,7 @@ to marketers-influence
     let add-adoption-score random-normal 7.69 1.8
     set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3)) + (infra-co-innovation * (0.43862))
     set marketers-met marketers-met + 1
-    ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
 end
@@ -194,6 +216,7 @@ to sas-influence
     let target one-of sas-here
     let random-adoption-score random-normal 23.085 5.38
     set adoption-score adoption-score + random-adoption-score + (average-mno-sharing * 0.43862 * 3) + (average-govt-incentive * (0.43862 / 2) * 3) + (average-local-govt-cooperation * (0.43862 / 3 ) * 3) + (infra-co-innovation * (0.43862) * 3)
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
 end
@@ -208,7 +231,6 @@ to memory-influence
       ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
       set friends-met friends-met + 1
     ]
-
   ]
 
 end
@@ -235,8 +257,10 @@ end
 to industry-industry-influence
 
   if any? industries-here with [adopt? = true][
+    let target one-of industries with [adopt? = true]
     let random-adoption-score random-normal 23.37 5.1
     set adoption-score adoption-score + random-adoption-score
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1 ][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
 end
@@ -263,8 +287,16 @@ end
 to change-mno
 
   if adopt? = true [
-    let max-pos max-mno self
-    ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+
+    ifelse tie-mno self = true [
+      let target one-of turtles-here with [adopt? = true]
+      let mno-color [mno] of target
+      ifelse mno-color = "red" [set mno "red" set color red][ifelse mno-color = "yellow" [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+    ]
+    [
+      let max-pos max-mno self
+      ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+    ]
   ]
 
 end
@@ -311,6 +343,18 @@ to-report max-mno [agent]
   let mno-list (list mno-red mno-yellow mno-blue)
   let mno-max max mno-list
   report position mno-max mno-list
+
+end
+
+to-report tie-mno [agent]
+
+  let red-temp [mno-red] of agent
+  let yellow-temp [mno-yellow] of agent
+  let blue-temp [mno-blue] of agent
+  let mno-list (list mno-red mno-yellow mno-blue)
+  let mode-mno first modes mno-list
+  let max-list-mno max mno-list
+  report mode-mno = max-list-mno
 
 end
 
