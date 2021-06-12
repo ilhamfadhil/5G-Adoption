@@ -116,7 +116,7 @@ to create-influencer
       set mno "red"
       set color red
     ][
-      ifelse random-float 1 >= 0.5 [
+      ifelse random-float 1 >= 0.4 [
         set mno "blue"
         set color blue
     ][
@@ -272,7 +272,7 @@ to change-adopt
   if adoption-score > threshold and adopt? = false[
     ifelse breed-type = peoples [
       let prob random-float 100
-      if adopt-prob < prob and breed-type = peoples[
+      if adopt-prob < prob [
         set adopt? true
         let x min (list (wealth - buying-power) 0)
         ifelse x <= -2[set wait-time 312][ifelse x <= -1 [set wait-time 208][ifelse x < 0 [set wait-time 104][set wait-time 1]]]
@@ -290,15 +290,46 @@ to change-mno
   if adopt? = true [
 
     ifelse tie-mno self = true [
+      ;; list mno color sendiri
+      let mno-count-list (list mno-red mno-yellow mno-blue)
+      ;; list pilihan warna
+      let mno-color-list (list "red" "yellow" "blue")
+      ;; hitung berapa angka yang sama
+      let max-mno-count max-mno self
+      let max-count frequency max-mno-count mno-count-list
+
+      ifelse max-count = 3 [
+        ;; kalau 3 random 1/3
+        let x random-float 1
+        ifelse x <= (1 / 3) [set mno "red"][ifelse x <= (2 / 3) [set mno "yellow"] [set mno "blue"]]
+      ][
+        ;; kalau 2 kurangin satu warna trus random berdasarkan posisi
+        let min-mno-count min mno-count-list
+        let min-pos position min-mno-count mno-count-list
+        let list-mno-choice remove-item min-pos mno-color-list
+
+        let x random-float 1
+
+        ifelse x >= 0.5 [set mno item 0 list-mno-choice][set mno item 1 list-mno-choice]
+
+      ]
+
       let target one-of turtles-here with [adopt? = true]
       let mno-color [mno] of target
-      ifelse mno-color = "red" [set mno "red" set color red][ifelse mno-color = "yellow" [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+      ifelse mno-color = "red" [set mno "red"][ifelse mno-color = "yellow" [set mno "yellow"][set mno "blue"]]
     ]
     [
       let max-pos max-mno self
-      ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+      ifelse max-pos = 0 [set mno "red"][ifelse max-pos = 1 [set mno "yellow"][set mno "blue"]]
     ]
+    change-color-mno
   ]
+
+end
+
+to change-color-mno
+
+  ifelse mno = "red" [set color red][ifelse mno = "yellow" [set color yellow][set color blue]]
 
 end
 
@@ -422,6 +453,12 @@ end
 to-report count-mno-buy? [mno-color]
 
   report count peoples with [buy? = true and mno = mno-color]
+
+end
+
+to-report frequency [an-item a-list]
+
+  report length (filter [i -> i = an-item] a-list)
 
 end
 @#$#@#$#@
