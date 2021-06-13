@@ -64,8 +64,8 @@ to setup
   set-default-shape industries "factory"
   set-default-shape sas "person business"
   create-influencer
-  create-pasar
-  create-perusahaan
+  create-market
+  create-companies
   create-solution-architect
 
   reset-ticks
@@ -81,7 +81,7 @@ to go
 
   ask peoples with [adopt? = false][
     marketers-influence
-    if teman? = true [peoples-influence]
+    if friends? = true [peoples-influence]
     if memory? = true [memory-influence]
     change-adopt
     change-mno
@@ -92,6 +92,7 @@ to go
     people-industry-influence
     industry-industry-influence
     change-adopt
+    change-mno
     ;; add change-mno to industry
   ]
 
@@ -109,7 +110,7 @@ end
 
 to create-influencer
 
-  create-marketers (jumlah-orang * (1 - proporsi-orang-marketer)) [
+  create-marketers (peoples-number * (1 - proportion-peoples-marketers)) [
     setxy random-xcor random-ycor
     set adopt? true
     ifelse random-float 1 >= 0.5 [
@@ -149,15 +150,15 @@ to create-solution-architect
 
 end
 
-to create-pasar
+to create-market
 
-  create-peoples (jumlah-orang * proporsi-orang-marketer) [
+  create-peoples (peoples-number * proportion-peoples-marketers) [
     setxy random-xcor random-ycor
     set color grey
     let threshold-num random-lognormal 30 20
     set threshold min (list threshold-num 100)
     set wealth random-lognormal lognormal-M lognormal-S
-    set adoption-score random 10
+    set adoption-score 0
     set adopt-prob max (list min (list random-normal 60 20 100) 0.000001)
     set adopt? false
     set buy? false
@@ -173,13 +174,13 @@ to create-pasar
 
 end
 
-to create-perusahaan
+to create-companies
 
-  create-industries 0.1 * jumlah-orang [
+  create-industries 0.1 * peoples-number [
     setxy random-xcor random-ycor
     set color grey
     set threshold random-normal 300 30
-    set adoption-score random 30
+    set adoption-score 0
     set adopt? false
     set buy? false
     set peoples-met 0
@@ -204,7 +205,7 @@ to marketers-influence
   if any? marketers-here [
     let target one-of marketers-here
     let add-adoption-score random-normal 7.69 1.8
-    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3)) + (infra-co-innovation * (0.43862))
+    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862 * 7.69) + (average-govt-incentive * (0.43862 * 7.69 / 2)) + (average-local-govt-cooperation * (0.43862 * 7.69 / 3)) + (infra-co-innovation * (0.43862 * 7.69))
     set marketers-met marketers-met + 1
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
@@ -216,7 +217,8 @@ to sas-influence
   if any? sas-here [
     let target one-of sas-here
     let random-adoption-score random-normal 23.085 5.38
-    set adoption-score adoption-score + random-adoption-score + (average-mno-sharing * 0.43862 * 3) + (average-govt-incentive * (0.43862 / 2) * 3) + (average-local-govt-cooperation * (0.43862 / 3 ) * 3) + (infra-co-innovation * (0.43862) * 3)
+    set sas-met sas-met + 1
+    set adoption-score adoption-score + random-adoption-score + (average-mno-sharing * 0.43862 * 23.085) + (average-govt-incentive * (0.43862 * 23.085 / 2)) + (average-local-govt-cooperation * (0.43862 * 23.085 / 3 )) + (infra-co-innovation * (0.43862 * 23.085))
     ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
@@ -279,7 +281,7 @@ to change-adopt
     ]]
     [
       set adopt? true
-      set wait-time 25
+      set wait-time 12 + random 40
     ]
   ]
 
@@ -524,28 +526,10 @@ NIL
 1
 
 PLOT
-833
-23
-1118
-173
-Threshold Distribution
-NIL
-Frequency
-0.0
-100.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 3.0 1 -16777216 true "" "histogram [threshold] of peoples"
-
-PLOT
-835
-337
-1121
-487
+896
+200
+1182
+350
 MNO Adoption Market Share Percentage
 Tick
 Percentage
@@ -566,8 +550,8 @@ SLIDER
 145
 637
 178
-jumlah-orang
-jumlah-orang
+peoples-number
+peoples-number
 10
 1000
 700.0
@@ -579,10 +563,10 @@ HORIZONTAL
 SLIDER
 653
 145
-824
+865
 178
-proporsi-orang-marketer
-proporsi-orang-marketer
+proportion-peoples-marketers
+proportion-peoples-marketers
 0.1
 1
 0.9
@@ -596,7 +580,7 @@ MONITOR
 92
 538
 137
-Orang
+Peoples
 count peoples
 17
 1
@@ -657,24 +641,6 @@ average-local-govt-cooperation
 1
 NIL
 HORIZONTAL
-
-PLOT
-1128
-22
-1408
-172
-Histogram of Wealth
-NIL
-Frequency
-0.0
-100.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 3.0 1 -16777216 true "" "histogram [wealth] of peoples"
 
 SWITCH
 704
@@ -758,8 +724,8 @@ SWITCH
 238
 809
 271
-teman?
-teman?
+friends?
+friends?
 1
 1
 -1000
@@ -767,9 +733,9 @@ teman?
 MONITOR
 552
 93
-612
+621
 138
-Industry
+Industries
 count industries
 0
 1
@@ -778,19 +744,19 @@ count industries
 MONITOR
 735
 93
-798
+804
 138
-Architect
+Accounts
 count sas
 17
 1
 11
 
 PLOT
-1128
-180
-1406
-330
+1188
+42
+1466
+192
 Industry Adoption and Buy Percentage
 Tick
 Percentage
@@ -817,10 +783,10 @@ count-adopt?-industries
 11
 
 PLOT
-834
-179
-1119
-329
+895
+42
+1180
+192
 Peoples Adoption and Buy Percentage
 Tick
 Percentage
@@ -851,10 +817,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-467
-519
-580
-579
+9
+485
+122
+545
 ARPU-mno-red
 60300.0
 1
@@ -862,10 +828,10 @@ ARPU-mno-red
 Number
 
 INPUTBOX
-586
-519
-691
-579
+128
+485
+233
+545
 ARPU-mno-yellow
 48240.0
 1
@@ -873,10 +839,10 @@ ARPU-mno-yellow
 Number
 
 INPUTBOX
-696
-519
-800
-579
+238
+485
+342
+545
 ARPU-mno-blue
 43550.0
 1
@@ -884,10 +850,10 @@ ARPU-mno-blue
 Number
 
 PLOT
-1127
-337
-1406
-487
+1006
+360
+1393
+517
 MNOs Revenue
 Tick
 NIL
