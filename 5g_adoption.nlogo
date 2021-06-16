@@ -252,7 +252,7 @@ end
 to people-industry-influence
 
   if any? peoples-here with [adopt? = true][
-    set adoption-score adoption-score + 0.57
+    set adoption-score adoption-score + 0.57 * 7.79
   ]
 
 end
@@ -431,6 +431,12 @@ end
 to-report count-mno-adopt? [mno-color]
 
   report count peoples with [adopt? = true and mno = mno-color]
+
+end
+
+to-report count-mno-industry [mno-color]
+
+  report count industries with [adopt? = true and mno = mno-color]
 
 end
 
@@ -850,9 +856,9 @@ ARPU-mno-blue
 Number
 
 PLOT
-1006
+1015
 360
-1393
+1374
 517
 MNOs Revenue
 Tick
@@ -865,9 +871,29 @@ true
 true
 "" ""
 PENS
-"Red" 1.0 0 -5298144 true "" "plot count-mno-buy? \"red\" * (ARPU-mno-red / 4)"
-"Yellow" 1.0 0 -4079321 true "" "plot count-mno-buy? \"yellow\" * (ARPU-mno-yellow / 4)"
-"Blue" 1.0 0 -14070903 true "" "plot count-mno-buy? \"blue\" * (ARPU-mno-blue / 4)"
+"Red" 1.0 0 -5298144 true "" "plot (count-mno-buy? \"red\" * (ARPU-mno-red / 4)) + (count-mno-industry \"red\" * ARPU-mno-red * 10)"
+"Yellow" 1.0 0 -4079321 true "" "plot (count-mno-buy? \"yellow\" * (ARPU-mno-yellow / 4)) + (count-mno-industry \"yellow\" * ARPU-mno-yellow * 10)"
+"Blue" 1.0 0 -14070903 true "" "plot (count-mno-buy? \"blue\" * (ARPU-mno-blue / 4)) + (count-mno-industry \"blue\" * ARPU-mno-blue * 10)"
+
+PLOT
+1186
+200
+1464
+350
+MNO Adoption Market Share Percentage Industry
+Tick
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"Red" 1.0 0 -2674135 true "" "carefully [plot count-mno-industry \"red\" / count-adopt?-industries] [plot 0]"
+"Yellow" 1.0 0 -4079321 true "" "carefully [plot count-mno-industry \"yellow\" / count-adopt?-industries] [plot 0]"
+"Blue" 1.0 0 -14070903 true "" "carefully [plot count-mno-industry \"blue\" / count-adopt?-industries] [plot 0]"
 
 @#$#@#$#@
 ## WHAT IS IT?
