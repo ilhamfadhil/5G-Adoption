@@ -252,7 +252,7 @@ end
 to people-industry-influence
 
   if any? peoples-here with [adopt? = true][
-    set adoption-score adoption-score + 0.57 * 7.79
+    set adoption-score adoption-score + (0.57 * 7.79)
   ]
 
 end
@@ -498,10 +498,10 @@ ticks
 30.0
 
 BUTTON
-470
-40
-534
-73
+464
+39
+528
+72
 Setup
 setup
 NIL
@@ -515,10 +515,10 @@ NIL
 1
 
 BUTTON
-549
-39
-612
-72
+543
+38
+606
+71
 go
 Go
 T
@@ -532,10 +532,10 @@ NIL
 1
 
 PLOT
-896
-200
-1182
-350
+869
+176
+1155
+326
 MNO Adoption Market Share Percentage
 Tick
 Percentage
@@ -552,10 +552,10 @@ PENS
 "Blue" 1.0 0 -14070903 true "" "carefully [plot count-mno-adopt? \"blue\" / count-adopt?] [plot 0]"
 
 SLIDER
-465
-145
-637
-178
+459
+144
+631
+177
 peoples-number
 peoples-number
 10
@@ -567,10 +567,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-653
-145
-865
-178
+647
+144
+859
+177
 proportion-peoples-marketers
 proportion-peoples-marketers
 0.1
@@ -582,10 +582,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-468
-92
-538
-137
+462
+91
+532
+136
 Peoples
 count peoples
 17
@@ -593,10 +593,10 @@ count peoples
 11
 
 MONITOR
-654
-94
-723
-139
+648
+93
+717
+138
 Marketers
 count marketers
 17
@@ -604,55 +604,55 @@ count marketers
 11
 
 SLIDER
-464
-196
-690
-229
+458
+195
+684
+228
 average-mno-sharing
 average-mno-sharing
 0
 4
-0.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-463
-234
-691
-267
+457
+233
+685
+266
 average-govt-incentive
 average-govt-incentive
 0
 2
-0.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-464
-277
-692
-310
+458
+276
+686
+309
 average-local-govt-cooperation
 average-local-govt-cooperation
 0
 3
-0.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-704
-196
-809
-229
+698
+195
+803
+228
 memory?
 memory?
 0
@@ -660,10 +660,10 @@ memory?
 -1000
 
 INPUTBOX
-705
-277
-781
-337
+699
+276
+775
+336
 lognormal-M
 5.0
 1
@@ -671,10 +671,10 @@ lognormal-M
 Number
 
 INPUTBOX
-705
-343
-781
-403
+699
+342
+775
+402
 lognormal-S
 6.0
 1
@@ -682,10 +682,10 @@ lognormal-S
 Number
 
 MONITOR
-531
-412
-603
-457
+525
+411
+597
+456
 Red-adopt
 count peoples with [adopt? = true and mno = \"red\"]
 0
@@ -693,10 +693,10 @@ count peoples with [adopt? = true and mno = \"red\"]
 11
 
 MONITOR
-465
-411
-522
-456
+459
+410
+516
+455
 Adopt?
 count peoples with [adopt? = true]
 0
@@ -704,10 +704,10 @@ count peoples with [adopt? = true]
 11
 
 MONITOR
-610
-412
-692
-457
+604
+411
+686
+456
 Yellow-adopt?
 count peoples with [adopt? = true  and mno = \"yellow\"]
 0
@@ -715,10 +715,10 @@ count peoples with [adopt? = true  and mno = \"yellow\"]
 11
 
 MONITOR
-702
-412
-775
-457
+696
+411
+769
+456
 Blue-adopt
 count peoples with [adopt? = true and mno = \"blue\"]
 17
@@ -726,10 +726,10 @@ count peoples with [adopt? = true and mno = \"blue\"]
 11
 
 SWITCH
-704
-238
-809
-271
+698
+237
+803
+270
 friends?
 friends?
 1
@@ -737,10 +737,10 @@ friends?
 -1000
 
 MONITOR
-552
-93
-621
-138
+546
+92
+615
+137
 Industries
 count industries
 0
@@ -748,10 +748,10 @@ count industries
 11
 
 MONITOR
-735
-93
-804
-138
+729
+92
+798
+137
 Accounts
 count sas
 17
@@ -759,10 +759,10 @@ count sas
 11
 
 PLOT
-1188
-42
-1466
-192
+1161
+18
+1439
+168
 Industry Adoption and Buy Percentage
 Tick
 Percentage
@@ -778,10 +778,10 @@ PENS
 "buy?" 1.0 0 -12895429 true "" "plot count industries with [buy? = true] / count industries"
 
 MONITOR
-466
-465
-562
-510
+460
+464
+556
+509
 Industry adopt
 count-adopt?-industries
 17
@@ -789,10 +789,10 @@ count-adopt?-industries
 11
 
 PLOT
-895
-42
-1180
-192
+868
+18
+1153
+168
 Peoples Adoption and Buy Percentage
 Tick
 Percentage
@@ -808,15 +808,15 @@ PENS
 "buy?" 1.0 0 -12895429 true "" "plot count peoples with [buy? = true] / count peoples"
 
 SLIDER
-464
-320
-694
-353
+458
+319
+688
+352
 infra-co-innovation
 infra-co-innovation
 0
 2
-0.0
+3.0
 1
 1
 NIL
@@ -856,10 +856,10 @@ ARPU-mno-blue
 Number
 
 PLOT
-1015
-360
-1374
-517
+988
+336
+1347
+493
 MNOs Revenue
 Tick
 NIL
@@ -876,10 +876,10 @@ PENS
 "Blue" 1.0 0 -14070903 true "" "plot (count-mno-buy? \"blue\" * (ARPU-mno-blue / 4)) + (count-mno-industry \"blue\" * ARPU-mno-blue * 10)"
 
 PLOT
-1186
-200
-1464
-350
+1159
+176
+1437
+326
 MNO Adoption Market Share Percentage Industry
 Tick
 NIL
@@ -1433,18 +1433,17 @@ NetLogo 6.2.0
     <metric>count-yellow-adopt?</metric>
     <metric>perc-adopt?</metric>
     <metric>perc-adopt?-industries</metric>
-    <enumeratedValueSet variable="jumlah-orang">
+    <enumeratedValueSet variable="peoples-number">
       <value value="700"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ARPU-mno-red">
       <value value="60300"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="proporsi-orang-marketer">
+    <enumeratedValueSet variable="proportion-peoples-marketers">
       <value value="0.9"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="infra-co-innovation">
-      <value value="0"/>
-      <value value="2"/>
+      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ARPU-mno-blue">
       <value value="43550"/>
@@ -1458,25 +1457,19 @@ NetLogo 6.2.0
     <enumeratedValueSet variable="memory?">
       <value value="true"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="teman?">
+    <enumeratedValueSet variable="friends?">
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="average-local-govt-cooperation">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="3"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="average-govt-incentive">
-      <value value="0"/>
-      <value value="1"/>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ARPU-mno-yellow">
       <value value="48240"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="average-mno-sharing">
-      <value value="0"/>
-      <value value="1"/>
       <value value="4"/>
     </enumeratedValueSet>
   </experiment>
