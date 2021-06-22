@@ -34,6 +34,11 @@ industries-own [
   sas-met
   peoples-met
   wait-time
+  mno
+  mno-red
+  mno-blue
+  mno-yellow
+  industries-list
 ]
 
 marketers-own [
@@ -43,6 +48,7 @@ marketers-own [
 
 sas-own [
   adopt?
+  mno
 ]
 
 to setup
@@ -58,8 +64,8 @@ to setup
   set-default-shape industries "factory"
   set-default-shape sas "person business"
   create-influencer
-  create-pasar
-  create-perusahaan
+  create-market
+  create-companies
   create-solution-architect
 
   reset-ticks
@@ -75,7 +81,7 @@ to go
 
   ask peoples with [adopt? = false][
     marketers-influence
-    if teman? = true [peoples-influence]
+    if friends? = true [peoples-influence]
     if memory? = true [memory-influence]
     change-adopt
     change-mno
@@ -86,6 +92,8 @@ to go
     people-industry-influence
     industry-industry-influence
     change-adopt
+    change-mno
+    ;; add change-mno to industry
   ]
 
   ask peoples [
@@ -102,7 +110,7 @@ end
 
 to create-influencer
 
-  create-marketers (jumlah-orang * (1 - proporsi-orang-marketer)) [
+  create-marketers (peoples-number * (1 - proportion-peoples-marketers)) [
     setxy random-xcor random-ycor
     set adopt? true
     ifelse random-float 1 >= 0.5 [
@@ -126,19 +134,31 @@ to create-solution-architect
     setxy random-xcor random-ycor
     set color grey
     set adopt? true
+
+    ifelse random-float 1 >= 0.5 [
+      set mno "red"
+      set color red
+    ][
+      ifelse random-float 1 >= 0.4 [
+        set mno "blue"
+        set color blue
+    ][
+        set mno "yellow"
+        set color yellow
+    ]]
   ]
 
 end
 
-to create-pasar
+to create-market
 
-  create-peoples (jumlah-orang * proporsi-orang-marketer) [
+  create-peoples (peoples-number * proportion-peoples-marketers) [
     setxy random-xcor random-ycor
     set color grey
     let threshold-num random-lognormal 30 20
     set threshold min (list threshold-num 100)
     set wealth random-lognormal lognormal-M lognormal-S
-    set adoption-score random 10
+    set adoption-score 0
     set adopt-prob max (list min (list random-normal 60 20 100) 0.000001)
     set adopt? false
     set buy? false
@@ -154,17 +174,21 @@ to create-pasar
 
 end
 
-to create-perusahaan
+to create-companies
 
-  create-industries 0.1 * jumlah-orang [
+  create-industries 0.1 * peoples-number [
     setxy random-xcor random-ycor
     set color grey
     set threshold random-normal 300 30
-    set adoption-score random 30
+    set adoption-score 0
     set adopt? false
     set buy? false
     set peoples-met 0
     set sas-met 0
+    set mno-red 0
+    set mno-blue 0
+    set mno-yellow 0
+    set industries-list other n-of 3 industries
   ]
 
 end
@@ -181,9 +205,9 @@ to marketers-influence
   if any? marketers-here [
     let target one-of marketers-here
     let add-adoption-score random-normal 7.69 1.8
-    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862) + (average-govt-incentive * (0.43862 / 2)) + (average-local-govt-cooperation * (0.43862 / 3)) + (infra-co-innovation * (0.43862))
+    set adoption-score adoption-score + add-adoption-score + (average-mno-sharing * 0.43862 * 7.69) + (average-govt-incentive * (0.43862 * 7.69 / 2)) + (average-local-govt-cooperation * (0.43862 * 7.69 / 3)) + (infra-co-innovation * (0.43862 * 7.69))
     set marketers-met marketers-met + 1
-    ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
 end
@@ -191,23 +215,25 @@ end
 to sas-influence
 
   if any? sas-here [
+    let target one-of sas-here
     let random-adoption-score random-normal 23.085 5.38
-    set adoption-score adoption-score + random-adoption-score
+    set sas-met sas-met + 1
+    set adoption-score adoption-score + random-adoption-score + (average-mno-sharing * 0.43862 * 23.085) + (average-govt-incentive * (0.43862 * 23.085 / 2)) + (average-local-govt-cooperation * (0.43862 * 23.085 / 3 )) + (infra-co-innovation * (0.43862 * 23.085))
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
 end
 
 to memory-influence
 
-  if any? peoples-here [
+  if any? peoples-here with [adopt? = true][
     let target one-of peoples-here
-    let add-adoption-score random-normal 10 5
+    let add-adoption-score random-normal 7.79 1.7
     if member? target friendlist = true [
       set adoption-score adoption-score + add-adoption-score
       ifelse [mno] of target = "red" [set mno-red mno-red + 1][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1] [set mno-blue mno-blue + 1]]
       set friends-met friends-met + 1
     ]
-
   ]
 
 end
@@ -226,7 +252,7 @@ end
 to people-industry-influence
 
   if any? peoples-here with [adopt? = true][
-    set adoption-score adoption-score + 0.57
+    set adoption-score adoption-score + (0.57 * 7.79)
   ]
 
 end
@@ -234,8 +260,10 @@ end
 to industry-industry-influence
 
   if any? industries-here with [adopt? = true][
+    let target one-of industries with [adopt? = true]
     let random-adoption-score random-normal 23.37 5.1
     set adoption-score adoption-score + random-adoption-score
+    ifelse [mno] of target = "red" [set mno-red mno-red + 1 ][ifelse [mno] of target = "yellow" [set mno-yellow mno-yellow + 1][set mno-blue mno-blue + 1]]
   ]
 
 end
@@ -246,14 +274,14 @@ to change-adopt
   if adoption-score > threshold and adopt? = false[
     ifelse breed-type = peoples [
       let prob random-float 100
-      if adopt-prob < prob and breed-type = peoples[
+      if adopt-prob < prob [
         set adopt? true
         let x min (list (wealth - buying-power) 0)
         ifelse x <= -2[set wait-time 312][ifelse x <= -1 [set wait-time 208][ifelse x < 0 [set wait-time 104][set wait-time 1]]]
     ]]
     [
       set adopt? true
-      set wait-time 25
+      set wait-time 12 + random 40
     ]
   ]
 
@@ -262,9 +290,48 @@ end
 to change-mno
 
   if adopt? = true [
-    let max-pos max-mno self
-    ifelse max-pos = 0 [set mno "red" set color red][ifelse max-pos = 1 [set mno "yellow" set color yellow][set mno "blue" set color blue]]
+
+    ifelse tie-mno self = true [
+      ;; list mno color sendiri
+      let mno-count-list (list mno-red mno-yellow mno-blue)
+      ;; list pilihan warna
+      let mno-color-list (list "red" "yellow" "blue")
+      ;; hitung berapa angka yang sama
+      let max-mno-count max-mno self
+      let max-count frequency max-mno-count mno-count-list
+
+      ifelse max-count = 3 [
+        ;; kalau 3 random 1/3
+        let x random-float 1
+        ifelse x <= (1 / 3) [set mno "red"][ifelse x <= (2 / 3) [set mno "yellow"] [set mno "blue"]]
+      ][
+        ;; kalau 2 kurangin satu warna trus random berdasarkan posisi
+        let min-mno-count min mno-count-list
+        let min-pos position min-mno-count mno-count-list
+        let list-mno-choice remove-item min-pos mno-color-list
+
+        let x random-float 1
+
+        ifelse x >= 0.5 [set mno item 0 list-mno-choice][set mno item 1 list-mno-choice]
+
+      ]
+
+      let target one-of turtles-here with [adopt? = true]
+      let mno-color [mno] of target
+      ifelse mno-color = "red" [set mno "red"][ifelse mno-color = "yellow" [set mno "yellow"][set mno "blue"]]
+    ]
+    [
+      let max-pos max-mno self
+      ifelse max-pos = 0 [set mno "red"][ifelse max-pos = 1 [set mno "yellow"][set mno "blue"]]
+    ]
+    change-color-mno
   ]
+
+end
+
+to change-color-mno
+
+  ifelse mno = "red" [set color red][ifelse mno = "yellow" [set color yellow][set color blue]]
 
 end
 
@@ -313,6 +380,18 @@ to-report max-mno [agent]
 
 end
 
+to-report tie-mno [agent]
+
+  let red-temp [mno-red] of agent
+  let yellow-temp [mno-yellow] of agent
+  let blue-temp [mno-blue] of agent
+  let mno-list (list mno-red mno-yellow mno-blue)
+  let mode-mno first modes mno-list
+  let max-list-mno max mno-list
+  report mode-mno = max-list-mno
+
+end
+
 to-report count-adopt?
 
   report count peoples with [adopt? = true]
@@ -331,9 +410,33 @@ to-report count-adopt?-industries
 
 end
 
+to-report count-buy?-people
+
+  report count peoples with [buy? = true]
+
+end
+
+to-report count-buy?-industries
+
+  report count industries with [buy? = true]
+
+end
+
 to-report perc-adopt?-industries
 
   report count-adopt?-industries / count industries
+
+end
+
+to-report count-mno-adopt? [mno-color]
+
+  report count peoples with [adopt? = true and mno = mno-color]
+
+end
+
+to-report count-mno-industry [mno-color]
+
+  report count industries with [adopt? = true and mno = mno-color]
 
 end
 
@@ -352,6 +455,18 @@ end
 to-report count-blue-adopt?
 
   report count peoples with [adopt? = true and mno = "blue"]
+
+end
+
+to-report count-mno-buy? [mno-color]
+
+  report count peoples with [buy? = true and mno = mno-color]
+
+end
+
+to-report frequency [an-item a-list]
+
+  report length (filter [i -> i = an-item] a-list)
 
 end
 @#$#@#$#@
@@ -383,10 +498,10 @@ ticks
 30.0
 
 BUTTON
-470
-40
-534
-73
+464
+39
+528
+72
 Setup
 setup
 NIL
@@ -400,10 +515,10 @@ NIL
 1
 
 BUTTON
-549
-39
-612
-72
+543
+38
+606
+71
 go
 Go
 T
@@ -417,29 +532,11 @@ NIL
 1
 
 PLOT
-833
-23
-1118
-173
-Threshold Distribution
-NIL
-Frequency
-0.0
-100.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 3.0 1 -16777216 true "" "histogram [threshold] of peoples"
-
-PLOT
-835
-337
-1121
-487
-MNO Adoption Count
+869
+176
+1155
+326
+MNO Adoption Market Share Percentage
 Tick
 Percentage
 0.0
@@ -450,17 +547,17 @@ true
 true
 "" ""
 PENS
-"Red" 1.0 0 -2674135 true "" "plot count peoples with [adopt? = true and mno = \"red\"] / count peoples"
-"Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] / count peoples"
-"Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] / count peoples"
+"Red" 1.0 0 -2674135 true "" "carefully [plot count-mno-adopt? \"red\" / count-adopt?] [plot 0]"
+"Yellow" 1.0 0 -4079321 true "" "carefully [plot count-mno-adopt? \"yellow\" / count-adopt?] [plot 0]"
+"Blue" 1.0 0 -14070903 true "" "carefully [plot count-mno-adopt? \"blue\" / count-adopt?] [plot 0]"
 
 SLIDER
-465
-145
-637
-178
-jumlah-orang
-jumlah-orang
+459
+144
+631
+177
+peoples-number
+peoples-number
 10
 1000
 700.0
@@ -470,12 +567,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-653
-145
-824
-178
-proporsi-orang-marketer
-proporsi-orang-marketer
+647
+144
+859
+177
+proportion-peoples-marketers
+proportion-peoples-marketers
 0.1
 1
 0.9
@@ -485,21 +582,21 @@ NIL
 HORIZONTAL
 
 MONITOR
-468
-92
-538
-137
-Orang
+462
+91
+532
+136
+Peoples
 count peoples
 17
 1
 11
 
 MONITOR
-654
-94
-723
-139
+648
+93
+717
+138
 Marketers
 count marketers
 17
@@ -507,73 +604,55 @@ count marketers
 11
 
 SLIDER
-464
-196
-690
-229
+458
+195
+684
+228
 average-mno-sharing
 average-mno-sharing
 0
 4
-0.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-463
-234
-691
-267
+457
+233
+685
+266
 average-govt-incentive
 average-govt-incentive
 0
 2
-0.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-464
-277
-692
-310
+458
+276
+686
+309
 average-local-govt-cooperation
 average-local-govt-cooperation
 0
 3
-0.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
-PLOT
-1128
-22
-1408
-172
-Histogram of Wealth
-NIL
-Frequency
-0.0
-100.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 3.0 1 -16777216 true "" "histogram [wealth] of peoples"
-
 SWITCH
-704
-196
-809
-229
+698
+195
+803
+228
 memory?
 memory?
 0
@@ -581,10 +660,10 @@ memory?
 -1000
 
 INPUTBOX
-705
-277
-781
-337
+699
+276
+775
+336
 lognormal-M
 5.0
 1
@@ -592,10 +671,10 @@ lognormal-M
 Number
 
 INPUTBOX
-705
-343
-781
-403
+699
+342
+775
+402
 lognormal-S
 6.0
 1
@@ -603,10 +682,10 @@ lognormal-S
 Number
 
 MONITOR
-531
-412
-603
-457
+525
+411
+597
+456
 Red-adopt
 count peoples with [adopt? = true and mno = \"red\"]
 0
@@ -614,10 +693,10 @@ count peoples with [adopt? = true and mno = \"red\"]
 11
 
 MONITOR
-465
-411
-522
-456
+459
+410
+516
+455
 Adopt?
 count peoples with [adopt? = true]
 0
@@ -625,10 +704,10 @@ count peoples with [adopt? = true]
 11
 
 MONITOR
-610
-412
-692
-457
+604
+411
+686
+456
 Yellow-adopt?
 count peoples with [adopt? = true  and mno = \"yellow\"]
 0
@@ -636,10 +715,10 @@ count peoples with [adopt? = true  and mno = \"yellow\"]
 11
 
 MONITOR
-702
-412
-775
-457
+696
+411
+769
+456
 Blue-adopt
 count peoples with [adopt? = true and mno = \"blue\"]
 17
@@ -647,44 +726,44 @@ count peoples with [adopt? = true and mno = \"blue\"]
 11
 
 SWITCH
-704
-238
-809
-271
-teman?
-teman?
+698
+237
+803
+270
+friends?
+friends?
 1
 1
 -1000
 
 MONITOR
-552
-93
-612
-138
-Industry
+546
+92
+615
+137
+Industries
 count industries
 0
 1
 11
 
 MONITOR
-735
-93
+729
+92
 798
-138
-Architect
+137
+Accounts
 count sas
 17
 1
 11
 
 PLOT
-1128
-180
-1406
-330
-Industry Adoption and Buy
+1161
+18
+1439
+168
+Industry Adoption and Buy Percentage
 Tick
 Percentage
 0.0
@@ -695,14 +774,14 @@ true
 true
 "" ""
 PENS
-"adopt?" 1.0 0 -5298144 true "" "plot count industries with [adopt? = true] / count industries"
-"buy?" 1.0 0 -14070903 true "" "plot count industries with [buy? = true] / count industries"
+"adopt?" 1.0 0 -15040220 true "" "plot count industries with [adopt? = true] / count industries"
+"buy?" 1.0 0 -12895429 true "" "plot count industries with [buy? = true] / count industries"
 
 MONITOR
-466
-465
-562
-510
+460
+464
+556
+509
 Industry adopt
 count-adopt?-industries
 17
@@ -710,11 +789,11 @@ count-adopt?-industries
 11
 
 PLOT
-834
-179
-1119
-329
-Peoples Adoption and Buy
+868
+18
+1153
+168
+Peoples Adoption and Buy Percentage
 Tick
 Percentage
 0.0
@@ -725,29 +804,29 @@ true
 true
 "" ""
 PENS
-"adopt?" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true] / count peoples"
-"buy?" 1.0 0 -14070903 true "" "plot count peoples with [buy? = true] / count peoples"
+"adopt?" 1.0 0 -14439633 true "" "plot count peoples with [adopt? = true] / count peoples"
+"buy?" 1.0 0 -12895429 true "" "plot count peoples with [buy? = true] / count peoples"
 
 SLIDER
-464
-320
-694
-353
+458
+319
+688
+352
 infra-co-innovation
 infra-co-innovation
 0
 2
-0.0
+3.0
 1
 1
 NIL
 HORIZONTAL
 
 INPUTBOX
-467
-519
-580
-579
+9
+485
+122
+545
 ARPU-mno-red
 60300.0
 1
@@ -755,10 +834,10 @@ ARPU-mno-red
 Number
 
 INPUTBOX
-586
-519
-691
-579
+128
+485
+233
+545
 ARPU-mno-yellow
 48240.0
 1
@@ -766,10 +845,10 @@ ARPU-mno-yellow
 Number
 
 INPUTBOX
-696
-519
-800
-579
+238
+485
+342
+545
 ARPU-mno-blue
 43550.0
 1
@@ -777,10 +856,10 @@ ARPU-mno-blue
 Number
 
 PLOT
-1127
-337
-1406
-487
+988
+336
+1347
+493
 MNOs Revenue
 Tick
 NIL
@@ -792,9 +871,29 @@ true
 true
 "" ""
 PENS
-"Red" 1.0 0 -5298144 true "" "plot count peoples with [adopt? = true and mno = \"red\"] * (ARPU-mno-red / 4)"
-"Yellow" 1.0 0 -4079321 true "" "plot count peoples with [adopt? = true and mno = \"yellow\"] * (ARPU-mno-yellow / 4)"
-"Blue" 1.0 0 -14070903 true "" "plot count peoples with [adopt? = true and mno = \"blue\"] * (ARPU-mno-blue / 4)"
+"Red" 1.0 0 -5298144 true "" "plot (count-mno-buy? \"red\" * (ARPU-mno-red / 4)) + (count-mno-industry \"red\" * ARPU-mno-red * 10)"
+"Yellow" 1.0 0 -4079321 true "" "plot (count-mno-buy? \"yellow\" * (ARPU-mno-yellow / 4)) + (count-mno-industry \"yellow\" * ARPU-mno-yellow * 10)"
+"Blue" 1.0 0 -14070903 true "" "plot (count-mno-buy? \"blue\" * (ARPU-mno-blue / 4)) + (count-mno-industry \"blue\" * ARPU-mno-blue * 10)"
+
+PLOT
+1159
+176
+1437
+326
+MNO Adoption Market Share Percentage Industry
+Tick
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"Red" 1.0 0 -2674135 true "" "carefully [plot count-mno-industry \"red\" / count-adopt?-industries] [plot 0]"
+"Yellow" 1.0 0 -4079321 true "" "carefully [plot count-mno-industry \"yellow\" / count-adopt?-industries] [plot 0]"
+"Blue" 1.0 0 -14070903 true "" "carefully [plot count-mno-industry \"blue\" / count-adopt?-industries] [plot 0]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1321,6 +1420,57 @@ NetLogo 6.2.0
       <value value="0"/>
       <value value="1"/>
       <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="experiment-final" repetitions="30" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1100"/>
+    <metric>seed-number</metric>
+    <metric>count-adopt?</metric>
+    <metric>count-red-adopt?</metric>
+    <metric>count-blue-adopt?</metric>
+    <metric>count-yellow-adopt?</metric>
+    <metric>perc-adopt?</metric>
+    <metric>perc-adopt?-industries</metric>
+    <enumeratedValueSet variable="peoples-number">
+      <value value="700"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ARPU-mno-red">
+      <value value="60300"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="proportion-peoples-marketers">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="infra-co-innovation">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ARPU-mno-blue">
+      <value value="43550"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-S">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lognormal-M">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="friends?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-local-govt-cooperation">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-govt-incentive">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ARPU-mno-yellow">
+      <value value="48240"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-mno-sharing">
+      <value value="4"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
