@@ -214,6 +214,10 @@ adopt_scen_df %>%
   labs(x = "Ticks", 
        y = "Density")
 
+selected_scenario <- c('0000', '1000', '0100', '0010', '0001', '1110', 
+                       '1111', '1212', '2111', '2121', '2222', 
+                       '3121', '3131', '3232', '4121', '4232')
+
 adopt_scen_df %>%
   group_by(seed) %>%
   filter(perc_adopt > 0.9) %>%
@@ -222,6 +226,8 @@ adopt_scen_df %>%
   mutate(group = str_c(mno_sharing, govt_incentive, govt_local_coop, infra_co_innov)) %>%
   group_by(group) %>%
   mutate(mean_perc = mean(n)) %>%
+  ungroup() %>%
+  filter(group %in% selected_scenario) %>%
   ggplot(aes(x = fct_rev(group), y = n)) +
   geom_boxplot() +
   geom_point(aes(y = mean_perc), 
@@ -356,7 +362,7 @@ rev_mno_total <- bind_rows(rev_mno_4232, rev_mno_1110)
 
 rev_mno_total %>%
   group_by(seed) %>%
-  filter(perc_ind >= 0.9) %>%
+  filter(perc_ind >= 0.95) %>%
   filter(n == min(n)) %>%
   ungroup() %>%
   group_by(group) %>%
@@ -373,6 +379,27 @@ rev_mno_total %>%
        title = "Total ARPU Revenue After 95% Adoption") +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))
+
+rev_mno_total %>%
+  group_by(seed) %>%
+  filter(perc_ind <= 0.95) %>%
+  # filter(n == min(n)) %>%
+  # ungroup() %>%
+  group_by(group, seed) %>%
+  summarise(cum_total_revenue = sum(total_revenue)) %>%
+  ungroup() %>%
+  group_by(group) %>%
+  mutate(mean_rev = mean(cum_total_revenue)) %>%
+  ungroup() %>%
+  ggplot(aes(x = fct_rev(group), y = cum_total_revenue)) +
+  geom_boxplot() +
+  geom_point(aes(y = mean_rev), 
+             color = "red") +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = "ARPU Revenue", 
+       y = "Skenario") +
+  theme_bw()
   
 rev_mno_total %>%
   group_by(seed) %>%
@@ -383,3 +410,17 @@ rev_mno_total %>%
   summarise(mean_rev = mean(total_revenue), 
             median_rev = median(total_revenue), 
             standard_deviasi = sd(total_revenue))
+
+rev_mno_total %>%
+  filter(n < 400)
+  group_by(group, n) %>%
+  summarise(mean_revenue = mean(total_revenue)) %>%
+  ggplot(aes(x = n, y = mean_revenue, 
+             color = group)) +
+  geom_line(lwd = 1) +
+  scale_y_continuous(labels = scales::comma)+
+  theme_bw() +
+  labs(x = "Tick", 
+       y = "Mean Revenue", 
+       color = "Scenario")
+  
